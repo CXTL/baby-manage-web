@@ -57,7 +57,7 @@ export default {
             loading: false,
             loginForm: {
                 username: 'admin',
-                password: '123123',
+                password: 'E4w6bemu/TxxxpmNmfqe7VowZKSm4ixdrfYm4N66wEZBkm7AOWTFHGHT0Qyg+7BNZtJKfAqfLtU5qu0oyZ2iaA==',
             },
             rules: {
                 username: [{required: true, trigger: 'blur', validator: validateUsername}],
