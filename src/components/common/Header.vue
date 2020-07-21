@@ -38,10 +38,8 @@
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <a href="https://github.com/lin-xin/baby-manage" target="_blank">
-                            <el-dropdown-item>项目仓库</el-dropdown-item>
-                        </a>
-                        <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
+                        <el-dropdown-item divided command="userInfo">用户信息</el-dropdown-item>
+                        <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
@@ -50,6 +48,7 @@
 </template>
 <script>
 import bus from '../common/bus';
+import store from '../../store';
 export default {
     data() {
         return {
@@ -68,9 +67,19 @@ export default {
     methods: {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
-            if (command == 'loginout') {
+            this.$message('click on item ' + command);
+            console.log("test")
+            // if (command === 'logout') {
+            if (true) {
+                console.log(command)
+
                 localStorage.removeItem('ms_username');
-                this.$router.push('/login');
+                store.dispatch('LogOut').then(()=>{
+
+                    // location.reload()// 为了重新实例化vue-router对象 避免bug
+                    this.$router.push('/login');
+                })
+
             }
         },
         // 侧边栏折叠
