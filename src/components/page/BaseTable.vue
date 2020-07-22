@@ -19,7 +19,7 @@
                     <el-option key="1" label="广东省" value="广东省"></el-option>
                     <el-option key="2" label="湖南省" value="湖南省"></el-option>
                 </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
+                <el-input v-model="query.username" placeholder="用户名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table
@@ -32,7 +32,7 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="name" label="用户名"></el-table-column>
+                <el-table-column prop="username"  label="用户名"></el-table-column>
                 <el-table-column label="账户余额">
                     <template slot-scope="scope">￥{{scope.row.money}}</template>
                 </el-table-column>
@@ -75,9 +75,9 @@
                 <el-pagination
                     background
                     layout="total, prev, pager, next"
-                    :current-page="query.pageIndex"
-                    :page-size="query.pageSize"
-                    :total="pageTotal"
+                    :current-page="query.page"
+                    :page-size="query.size"
+                    :total="totalPage"
                     @current-change="handlePageChange"
                 ></el-pagination>
             </div>
@@ -87,7 +87,7 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="用户名">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.username"></el-input>
                 </el-form-item>
                 <el-form-item label="地址">
                     <el-input v-model="form.address"></el-input>
@@ -109,15 +109,15 @@ export default {
         return {
             query: {
                 address: '',
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
+                username: '',
+                page: 1,
+                size: 10
             },
             tableData: [],
             multipleSelection: [],
             delList: [],
             editVisible: false,
-            pageTotal: 0,
+            totalPage: 0,
             form: {},
             idx: -1,
             id: -1
@@ -130,14 +130,15 @@ export default {
         // 获取 easy-mock 的模拟数据
         getData() {
             fetchData(this.query).then(res => {
-                console.log(res);
-                this.tableData = res.list;
-                this.pageTotal = res.pageTotal || 50;
+                console.log(res.data);
+                this.tableData = res.data.list;
+                console.log(this.tableData)
+                this.totalPage = res.data.totalPage || 50;
             });
         },
         // 触发搜索按钮
         handleSearch() {
-            this.$set(this.query, 'pageIndex', 1);
+            this.$set(this.query, 'page', 1);
             this.getData();
         },
         // 删除操作
@@ -161,7 +162,7 @@ export default {
             let str = '';
             this.delList = this.delList.concat(this.multipleSelection);
             for (let i = 0; i < length; i++) {
-                str += this.multipleSelection[i].name + ' ';
+                str += this.multipleSelection[i].username + ' ';
             }
             this.$message.error(`删除了${str}`);
             this.multipleSelection = [];
@@ -180,7 +181,7 @@ export default {
         },
         // 分页导航
         handlePageChange(val) {
-            this.$set(this.query, 'pageIndex', val);
+            this.$set(this.query, 'page', val);
             this.getData();
         }
     }
