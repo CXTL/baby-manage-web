@@ -35,15 +35,15 @@ export function fetchList(params) {
 
 export function createAdmin(data) {
   return request({
-    url: '/admin/register',
+    url: '/api/users/addUser',
     method: 'post',
     data: data
   })
 }
 
-export function updateAdmin(id, data) {
+export function updateUser(data) {
   return request({
-    url: '/admin/update/' + id,
+    url: '/api/users/updateUser',
     method: 'post',
     data: data
   })
@@ -57,10 +57,11 @@ export function updateStatus(id, params) {
   })
 }
 
-export function deleteAdmin(id) {
+export function deleteAdmin(params) {
   return request({
-    url: '/admin/delete/' + id,
-    method: 'post'
+    url: '/api/users/delete',
+    method: 'post',
+    params: params
   })
 }
 
