@@ -46,17 +46,21 @@
                 v-loading="listLoading" border
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="username"  label="用户名" align="center"></el-table-column>
-                <el-table-column prop="nickName"  label="昵称" align="center"></el-table-column>
-                <el-table-column label="手机号" prop="phone" align="center"></el-table-column>
-                <el-table-column label="头像(查看大图)" align="center">
+                <el-table-column label="ID"  prop="id"   width="55" align="center"></el-table-column>
+                <el-table-column label="名称" prop="name" ign="center"></el-table-column>
+                <el-table-column label="权限" prop="permission" align="center"></el-table-column>
+                <el-table-column label="父名称" prop="pName" lign="center"></el-table-column>
+                <el-table-column label="路径" prop="path" align="center"></el-table-column>
+                <el-table-column label="排序" prop="sort" align="center"></el-table-column>
+                <el-table-column label="图标" prop="icon" align="center"></el-table-column>
+                <el-table-column label="是否隐藏" align="center">
                     <template slot-scope="scope">
-                        <el-image
-                            class="table-td-thumb"
-                            :src="scope.row.headUrl"
-                            :preview-src-list="[scope.row.headUrl]"
-                        ></el-image>
+                        {{scope.row.hidden | formatHidden}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="类型" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.status | formatType}}
                     </template>
                 </el-table-column>
                 <el-table-column label="创建时间" align="center">
@@ -64,15 +68,7 @@
                         {{scope.row.createTime | formatTime}}
                     </template>
                 </el-table-column>
-                <el-table-column label="状态" align="center">
-                    <template slot-scope="scope">
-                        {{scope.row.status | formatStatus}}
-                    </template>
-
-                </el-table-column>
-
-                <el-table-column prop="email" label="邮箱" align="center"></el-table-column>
-                <el-table-column label="手机号" prop="phone" align="center"></el-table-column>
+                <el-table-column label="备注" prop="remark" align="center"></el-table-column>
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -159,12 +155,12 @@
 </template>
 
 <script>
-import { fetchData } from '@/api/index';
-import {formatDate} from '@/utils/date';
-import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/login';
+    import { fetchMenuData } from '@/api/index';
+    import {formatDate} from '@/utils/date';
+import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/menu';
 
 const defaultListQuery = {
-    username: null,
+    name: null,
     page: 1,
     size: 10
 }
@@ -209,26 +205,18 @@ export default {
             let date = new Date(time);
             return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
         },
-        formatStatus(value) {
+        formatHidden(value) {
             if (value === 1) {
-                return '已激活';
-            } else if (value === 2) {
-                return '已锁定';
-            } else if (value === 3) {
-                return '已注销';
-            } else if (value === 4) {
-                return '账号异常';
+                return '是';
             } else {
-                return '未激活';
+                return '否';
             }
         },
-        formatPayType(value) {
+        formatType(value) {
             if (value === 1) {
-                return '支付宝';
-            } else if (value === 2) {
-                return '微信';
-            } else {
-                return '未支付';
+                return '资源权限';
+            }  else {
+                return '菜单权限';
             }
         },
     },
@@ -251,7 +239,7 @@ export default {
         // 获取 easy-mock 的模拟数据
         getData() {
             this.listLoading=true;
-            fetchData(this.query).then(res => {
+            fetchMenuData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
                 this.total = res.data.total || 50;

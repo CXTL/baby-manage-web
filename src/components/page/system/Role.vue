@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import { fetchData } from '@/api/index';
+import { fetchUserData } from '@/api/index';
 import {formatDate} from '@/utils/date';
 import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/login';
 
@@ -251,7 +251,7 @@ export default {
         // 获取 easy-mock 的模拟数据
         getData() {
             this.listLoading=true;
-            fetchData(this.query).then(res => {
+            fetchUserData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
                 this.total = res.data.total || 50;
