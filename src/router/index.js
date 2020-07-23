@@ -24,11 +24,11 @@ export default new Router({
                     component: () => import(/* webpackChunkName: "icon" */ '../components/page/Icon.vue'),
                     meta: { title: '自定义图标' }
                 },
-                {
-                    path: '/table',
-                    component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
-                    meta: { title: '基础表格' }
-                },
+                // {
+                //     path: '/table',
+                //     component: () => import(/* webpackChunkName: "table" */ '../components/page/User.vue'),
+                //     meta: { title: '基础表格' }
+                // },
                 // {
                 //     path: '/tabs',
                 //     component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
@@ -96,6 +96,50 @@ export default new Router({
                     path: '/403',
                     component: () => import(/* webpackChunkName: "403" */ '../components/page/403.vue'),
                     meta: { title: '403' }
+                },
+                {
+                    path: '/menu',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '菜单管理' }
+                },
+                {
+                    path: '/user',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '用户管理' }
+                },
+                {
+                    path: '/role',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '角色管理' }
+                },
+                {
+                    path: '/log',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '日志管理' }
+                }
+
+
+
+                ,
+                {
+                    path: '/account',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '分账管理' }
+                },
+                {
+                    path: '/payAndReceive',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '应付应收' }
+                },
+                {
+                    path: '/assets',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '资产管理' }
+                },
+                {
+                    path: '/cost',
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/User.vue'),
+                    meta: { title: '费用管理' }
                 }
                 // ,
                 // {

@@ -63,68 +63,27 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-cascades',
-                    index: 'table',
-                    title: '基础表格'
+                    index: 'system',
+                    title: '系统管理',
+                    subs: [
+                        {
+                            index: 'user',
+                            title: '用户管理'
+                        },
+                        {
+                            index: 'menu',
+                            title: '菜单管理'
+                        },
+                        {
+                            index: 'role',
+                            title: '角色管理'
+                        },
+                        {
+                            index: 'log',
+                            title: '日志管理'
+                        }
+                    ]
                 },
-                // {
-                //     icon: 'el-icon-lx-copy',
-                //     index: 'tabs',
-                //     title: 'tab选项卡'
-                // },
-                // {
-                //     icon: 'el-icon-lx-calendar',
-                //     index: '3',
-                //     title: '表单相关',
-                //     subs: [
-                //         {
-                //             index: 'form',
-                //             title: '基本表单'
-                //         },
-                //         {
-                //             index: '3-2',
-                //             title: '三级菜单',
-                //             subs: [
-                //                 {
-                //                     index: 'editor',
-                //                     title: '富文本编辑器'
-                //                 },
-                //                 {
-                //                     index: 'markdown',
-                //                     title: 'markdown编辑器'
-                //                 }
-                //             ]
-                //         },
-                //         {
-                //             index: 'upload',
-                //             title: '文件上传'
-                //         }
-                //     ]
-                // },
-                // {
-                //     icon: 'el-icon-lx-emoji',
-                //     index: 'icon',
-                //     title: '自定义图标'
-                // },
-                // {
-                //     icon: 'el-icon-pie-chart',
-                //     index: 'charts',
-                //     title: 'schart图表'
-                // },
-                // {
-                //     icon: 'el-icon-rank',
-                //     index: '6',
-                //     title: '拖拽组件',
-                //     subs: [
-                //         {
-                //             index: 'drag',
-                //             title: '拖拽列表'
-                //         },
-                //         {
-                //             index: 'dialog',
-                //             title: '拖拽弹框'
-                //         }
-                //     ]
-                // },
                 {
                     icon: 'el-icon-lx-global',
                     index: 'i18n',
@@ -144,13 +103,30 @@ export default {
                             title: '404页面'
                         }
                     ]
+                },
+                {
+                    icon: 'el-icon-lx-cascades',
+                    index: 'finance',
+                    title: '财务管理',
+                    subs: [
+                        {
+                            index: 'account',
+                            title: '分账管理'
+                        },
+                        {
+                            index: 'payAndReceive',
+                            title: '应付应收'
+                        },
+                        {
+                            index: 'assets',
+                            title: '资产管理'
+                        },
+                        {
+                            index: 'cost',
+                            title: '费用管理'
+                        }
+                    ]
                 }
-                // ,
-                // {
-                //     icon: 'el-icon-lx-redpacket_fill',
-                //     index: '/donate',
-                //     title: '支持作者'
-                // }
             ]
         };
     },
