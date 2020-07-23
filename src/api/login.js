@@ -65,6 +65,16 @@ export function deleteAdmin(params) {
   })
 }
 
+
+export function deleteBatchAdmin(params) {
+  return request({
+    url: '/api/users/deleteBatch',
+    method: 'post',
+    params: params
+  })
+}
+
+
 export function getRoleByAdmin(id) {
   return request({
     url: '/admin/role/' + id,

@@ -4,7 +4,21 @@
         <el-card class="filter-container" shadow="never">
             <div class="handle-box">
                 <span>用户名: </span><el-input v-model="query.username" placeholder="用户名" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+
+                <el-button
+                        style="float:right"
+                        type="primary"
+                        icon="el-icon-search"
+                        @click="handleSearch()"
+                        size="small">
+                    搜索
+                </el-button>
+                <el-button
+                        style="float:right;margin-right: 15px"
+                        @click="handleResetSearch()"
+                        size="small">
+                    重置
+                </el-button>
             </div>
         </el-card>
         <el-card class="operate-container" shadow="never">
@@ -29,6 +43,7 @@
                 ref="multipleTable"
                 header-cell-class-name="table-header"
                 @selection-change="handleSelectionChange"
+                v-loading="listLoading" border
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
@@ -61,11 +76,6 @@
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-<!--                        <el-button-->
-<!--                            type="text"-->
-<!--                            icon="el-icon-edit"-->
-<!--                            @click="handleEdit(scope.$index, scope.row)"-->
-<!--                        >编辑</el-button>-->
                         <el-button size="mini"
                                    type="text"
                                    icon="el-icon-edit"
@@ -82,37 +92,20 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="pagination">
 
 
-                <el-pagination
-                        @size-change="handleSizeChange"
-                        @current-change="handlePageChange"
-                        :current-page="query.page"
-                        :page-sizes="[1, 10, 50, 100]"
-                        :page-size="query.size"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        :total="totalPage">
-                </el-pagination>
-
+        <div class="pagination">
+            <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="handlePageChange"
+                    layout="total, sizes,prev, pager, next,jumper"
+                    :current-page="query.page"
+                    :page-size="query.size"
+                    :page-sizes="[5,10,15]"
+                    :total="total">
+            </el-pagination>
         </div>
-
-        <!-- 编辑弹出框 -->
-<!--        <el-dialog title="编辑" :visible.sync="editVisible" width="50%">-->
-<!--            <el-form ref="form" :model="form" label-width="70px">-->
-<!--                <el-form-item label="用户名">-->
-<!--                    <el-input v-model="form.username"></el-input>-->
-<!--                </el-form-item>-->
-<!--                <el-form-item label="地址">-->
-<!--                    <el-input v-model="form.address"></el-input>-->
-<!--                </el-form-item>-->
-<!--            </el-form>-->
-<!--            <span slot="footer" class="dialog-footer">-->
-<!--                <el-button @click="editVisible = false">取 消</el-button>-->
-<!--                <el-button type="primary" @click="saveEdit">确 定</el-button>-->
-<!--            </span>-->
-<!--        </el-dialog>-->
-
 
         <el-dialog
                 :title="isEdit?'编辑用户':'添加用户'"
@@ -168,7 +161,13 @@
 <script>
 import { fetchData } from '../../api/index';
 import {formatDate} from '@/utils/date';
-import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole} from '@/api/login';
+import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/login';
+
+const defaultListQuery = {
+    username: null,
+    page: 1,
+    size: 10
+}
 
 const defaultAdmin = {
     id: null,
@@ -185,19 +184,14 @@ export default {
     name: 'basetable',
     data() {
         return {
-            query: {
-                address: '',
-                username: '',
-                page: 1,
-                size: 10
-            },
+            query: Object.assign({},defaultListQuery),
             tableData: [],
             multipleSelection: [],
             delList: [],
             dialogVisible: false,
-            editVisible: false,
+            listLoading:false,
             isEdit: false,
-            totalPage: 0,
+            total: 0,
             form: {},
             admin: Object.assign({}, defaultAdmin),
             idx: -1,
@@ -239,7 +233,9 @@ export default {
         },
     },
     methods: {
-
+        handleResetSearch() {
+            this.query = Object.assign({}, defaultListQuery);
+        },
         handleUpdate(index, row) {
             this.dialogVisible = true;
             this.isEdit = true;
@@ -254,11 +250,11 @@ export default {
 
         // 获取 easy-mock 的模拟数据
         getData() {
+            this.listLoading=true;
             fetchData(this.query).then(res => {
-                console.log(res.data);
+                this.listLoading=false;
                 this.tableData = res.data.list;
-                console.log(this.tableData)
-                this.totalPage = res.data.totalPage || 50;
+                this.total = res.data.total || 50;
             });
         },
         // 触发搜索按钮
@@ -286,29 +282,52 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
+        //批量删除
         delAllSelection() {
-            const length = this.multipleSelection.length;
-            let str = '';
-            this.delList = this.delList.concat(this.multipleSelection);
-            for (let i = 0; i < length; i++) {
-                str += this.multipleSelection[i].username + ' ';
+            console.log(this.multipleSelection)
+            if(this.multipleSelection==null || this.multipleSelection.length < 1){
+                this.$message({
+                    message: '请选择数据',
+                    type: 'warning',
+                    duration: 1000
+                });
+                return;
             }
-            this.$message.error(`删除了${str}`);
-            this.multipleSelection = [];
-        },
-        // // 编辑操作
-        // handleEdit(index, row) {
-        //     this.idx = index;
-        //     this.form = row;
-        //     this.editVisible = true;
-        // },
-        // 保存编辑
-        // saveEdit() {
-        //     this.editVisible = false;
-        //     this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-        //     this.$set(this.tableData, this.idx, this.form);
-        // },
 
+
+            //批量删除
+            this.$confirm('是否要进行删除操作?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                let params = new URLSearchParams();
+                let ids=[];
+                for(let i=0;i<this.multipleSelection.length;i++){
+                    ids.push(this.multipleSelection[i].id);
+                }
+                params.append("ids",ids);
+                console.log(params)
+                deleteBatchAdmin(params).then(response=>{
+                    this.getData();
+                    this.$message({
+                        type: 'success',
+                        message: '删除成功!'
+                    });
+                });
+            })
+
+
+            // const length = this.multipleSelection.length;
+            // let str = '';
+            // this.delList = this.delList.concat(this.multipleSelection);
+            // for (let i = 0; i < length; i++) {
+            //     str += this.multipleSelection[i].username + ' ';
+            // }
+            // this.$message.error(`删除了${str}`);
+            // this.multipleSelection = [];
+        },
+        //页面编辑
         handleDialogConfirm() {
             this.$confirm('是否要确认?', '提示', {
                 confirmButtonText: '确定',
@@ -339,16 +358,13 @@ export default {
 
         // 分页导航
         handlePageChange(val) {
-            console.log(val)
-            console.log(this.query)
-            this.$set(this.query, 'page', val);
+            this.query.page = val;
             this.getData();
         },
         // 分页导航
         handleSizeChange(val) {
-            console.log(val)
-            console.log(this.query)
-            this.$set(this.query, 'size', val);
+            this.query.page = 1;
+            this.query.size = val;
             this.getData();
         }
 
