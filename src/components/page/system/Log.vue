@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import { fetchData } from '../../api/index';
+import { fetchData } from '@/api/index';
 import {formatDate} from '@/utils/date';
 import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/login';
 

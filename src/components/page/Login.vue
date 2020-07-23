@@ -33,8 +33,8 @@
 
 <script>
     import {isvalidUsername} from '@/utils/validate';
-    import { setCookie } from '../../utils/support';
-    import store from '../../store'
+    import { setCookie } from '@/utils/support';
+    import store from '@/store'
 export default {
     data: function() {
 

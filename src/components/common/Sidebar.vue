@@ -79,8 +79,16 @@ export default {
                             title: '角色管理'
                         },
                         {
-                            index: 'log',
-                            title: '日志管理'
+                            index: 'dict',
+                            title: '字典管理'
+                        },
+                        {
+                            index: 'loginLog',
+                            title: '登陆日志'
+                        },
+                        {
+                            index: 'businessLog',
+                            title: '业务日志'
                         }
                     ]
                 },
