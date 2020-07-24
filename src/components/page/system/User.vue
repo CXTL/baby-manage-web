@@ -314,7 +314,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 let params = new URLSearchParams();
-                params.append("adminId", this.allocAdminId);
+                params.append("userId", this.allocAdminId);
                 params.append("roleIds", this.allocRoleIds);
                 allocRole(params).then(response => {
                     this.$message({
@@ -420,7 +420,7 @@ export default {
         //获取全部角色
         fetchAllRoleList(){
             fetchAllRoleList().then(res=>{
-                this.allocRoleIds = res.data;
+                this.allRoleList = res.data;
             })
         }
 
