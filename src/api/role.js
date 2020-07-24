@@ -27,4 +27,9 @@ export function deleteRole(params) {
   })
 }
 
-
+export function fetchAllRoleList() {
+  return request({
+    url: '/api/roles/listAll',
+    method: 'get'
+  })
+}

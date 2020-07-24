@@ -3,7 +3,7 @@
 
         <el-card class="filter-container" shadow="never">
             <div class="handle-box">
-                <span>用户名: </span><el-input v-model="query.username" placeholder="用户名" class="handle-input mr10"></el-input>
+                <span>菜单名称: </span><el-input v-model="query.name" placeholder="菜单名称" class="handle-input mr10"></el-input>
 
                 <el-button
                         style="float:right"
@@ -104,45 +104,49 @@
         </div>
 
         <el-dialog
-                :title="isEdit?'编辑用户':'添加用户'"
+                :title="isEdit?'编辑菜单':'添加菜单'"
                 :visible.sync="dialogVisible"
                 width="40%">
-            <el-form :model="admin"
-                     ref="adminForm"
+            <el-form :model="menu"
+                     ref="menuForm"
                      label-width="150px" size="small">
-                    <el-form-item label="帐号：">
-                        <el-input v-model="admin.username" style="width: 250px"></el-input>
+                    <el-form-item label="名称：">
+                        <el-input v-model="menu.name" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="昵称：">
-                        <el-input v-model="admin.nickName" style="width: 250px"></el-input>
+                    <el-form-item label="父菜单名称：">
+                        <el-input v-model="menu.pid" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="邮箱：">
-                        <el-input v-model="admin.email" style="width: 250px"></el-input>
+                    <el-form-item label="路径：">
+                        <el-input v-model="menu.path" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="密码：">
-                        <el-input v-model="admin.password"  type="password"  style="width: 250px"></el-input>
+                    <el-form-item label="图标：">
+                        <el-input v-model="menu.icon"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="手机号：">
-                        <el-input v-model="admin.phone"  style="width: 250px"></el-input>
+                    <el-form-item label="排序：">
+                        <el-input v-model="menu.sort"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="备注：">
-                        <el-input v-model="admin.note"
-                                  type="textarea"
-                                  :rows="5"
-                                  style="width: 250px"></el-input>
+                    <el-form-item label="权限：">
+                        <el-input v-model="menu.permission"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="性别：">
-                        <el-radio-group v-model="admin.sex">
-                            <el-radio :label=1>男</el-radio>
-                            <el-radio :label=0>女</el-radio>
+                    <el-form-item label="类型：">
+                        <el-radio-group v-model="menu.type">
+                            <el-radio :label="1">资源权限</el-radio>
+                            <el-radio :label="0">菜单权限</el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="是否激活：">
-                        <el-radio-group v-model="admin.status">
+                    <el-form-item label="是否隐藏：">
+                        <el-radio-group v-model="menu.hidden">
                             <el-radio :label="1">是</el-radio>
                             <el-radio :label="0">否</el-radio>
                         </el-radio-group>
                     </el-form-item>
+
+                <el-form-item label="备注：">
+                    <el-input v-model="menu.remark"
+                              type="textarea"
+                              :rows="5"
+                              style="width: 250px"></el-input>
+                </el-form-item>
 
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -157,7 +161,7 @@
 <script>
     import { fetchMenuData } from '@/api/index';
     import {formatDate} from '@/utils/date';
-import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/menu';
+    import {createMenu,updateMenu,deleteMenu} from '@/api/menu';
 
 const defaultListQuery = {
     name: null,
@@ -165,15 +169,17 @@ const defaultListQuery = {
     size: 10
 }
 
-const defaultAdmin = {
+const defaultMenu = {
     id: null,
-    username: null,
-    password: null,
-    nickName: null,
-    email: null,
-    note: null,
-    status: 1,
-    sex: null
+    name: null,
+    pid: null,
+    sort: null,
+    path: null,
+    icon: null,
+    type: 0,
+    hidden: 1,
+    permission: null,
+    remark: null
 };
 
 export default {
@@ -189,7 +195,7 @@ export default {
             isEdit: false,
             total: 0,
             form: {},
-            admin: Object.assign({}, defaultAdmin),
+            menu: Object.assign({}, defaultMenu),
             idx: -1,
             id: -1
         };
@@ -227,13 +233,13 @@ export default {
         handleUpdate(index, row) {
             this.dialogVisible = true;
             this.isEdit = true;
-            this.admin = Object.assign({},row);
+            this.menu = Object.assign({},row);
         },
 
         handleAdd(index, row) {
             this.dialogVisible = true;
             this.isEdit = false;
-            this.admin = Object.assign({},defaultAdmin);
+            this.menu = Object.assign({},defaultMenu);
         },
 
         // 获取 easy-mock 的模拟数据
@@ -257,12 +263,14 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    deleteAdmin({userId:row.id}).then(res =>{
+                    let ids=[];
+                    let params = new URLSearchParams();
+                    ids.push(row.id)
+                    params.append("ids",ids);
+                    deleteMenu(params).then(res =>{
                         this.$message.success('删除成功');
                         this.tableData.splice(index, 1);
                     })
-
-
                 })
                 .catch(() => {});
         },
@@ -296,7 +304,7 @@ export default {
                 }
                 params.append("ids",ids);
                 console.log(params)
-                deleteBatchAdmin(params).then(response=>{
+                deleteMenu(params).then(response=>{
                     this.getData();
                     this.$message({
                         type: 'success',
@@ -305,15 +313,6 @@ export default {
                 });
             })
 
-
-            // const length = this.multipleSelection.length;
-            // let str = '';
-            // this.delList = this.delList.concat(this.multipleSelection);
-            // for (let i = 0; i < length; i++) {
-            //     str += this.multipleSelection[i].username + ' ';
-            // }
-            // this.$message.error(`删除了${str}`);
-            // this.multipleSelection = [];
         },
         //页面编辑
         handleDialogConfirm() {
@@ -323,7 +322,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 if (this.isEdit) {
-                    updateUser(this.admin).then(response => {
+                    updateMenu(this.menu).then(response => {
                         this.$message({
                             message: '修改成功！',
                             type: 'success'
@@ -332,7 +331,7 @@ export default {
                         this.getData();
                     })
                 } else {
-                    createAdmin(this.admin).then(response => {
+                    createMenu(this.menu).then(response => {
                         this.$message({
                             message: '添加成功！',
                             type: 'success'

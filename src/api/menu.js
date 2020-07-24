@@ -1,100 +1,28 @@
 import request from '@/utils/request'
 
-export function login(username, password) {
-  return request({
-    url: '/admin/api/login',
-    method: 'post',
-    data: {
-      username,
-      password
-    }
-  })
-}
 
-export function getInfo() {
+export function createMenu(data) {
   return request({
-    url: '/admin/info',
-    method: 'get',
-  })
-}
-
-export function logout() {
-  return request({
-    url: '/admin/api/logout',
-    method: 'post'
-  })
-}
-
-export function fetchList(params) {
-  return request({
-    url: '/admin/list',
-    method: 'get',
-    params: params
-  })
-}
-
-export function createAdmin(data) {
-  return request({
-    url: '/api/users/addUser',
+    url: '/api/menus/addMenu',
     method: 'post',
     data: data
   })
 }
 
-export function updateUser(data) {
+export function updateMenu(data) {
   return request({
-    url: '/api/users/updateUser',
+    url: '/api/menus/updateMenu',
     method: 'post',
     data: data
   })
 }
 
-export function updateStatus(id, params) {
+
+export function deleteMenu(params) {
   return request({
-    url: '/admin/updateStatus/' + id,
+    url: '/api/menus/deleteMenu',
     method: 'post',
     params: params
   })
-}
-
-export function deleteAdmin(params) {
-  return request({
-    url: '/api/users/delete',
-    method: 'post',
-    params: params
-  })
-}
-
-
-export function deleteBatchAdmin(params) {
-  return request({
-    url: '/api/users/deleteBatch',
-    method: 'post',
-    params: params
-  })
-}
-
-
-export function getRoleByAdmin(id) {
-  return request({
-    url: '/admin/role/' + id,
-    method: 'get'
-  })
-}
-
-export function allocRole(data) {
-  return request({
-    url: '/admin/role/update',
-    method: 'post',
-    data: data
-  })
-}
-
-export const fetchUserData = query => {
-  return request({
-    url: '/api/users/listByPage',
-    method: 'post',
-    data: query
-  });
 }
 

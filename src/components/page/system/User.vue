@@ -78,6 +78,11 @@
                     <template slot-scope="scope">
                         <el-button size="mini"
                                    type="text"
+                                   @click="handleSelectRole(scope.$index, scope.row)">分配角色
+                        </el-button>
+
+                        <el-button size="mini"
+                                   type="text"
                                    icon="el-icon-edit"
                                    @click="handleUpdate(scope.$index, scope.row)">
                             编辑
@@ -154,16 +159,33 @@
         <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
       </span>
         </el-dialog>
-
+        <el-dialog
+                title="分配角色"
+                :visible.sync="allocDialogVisible"
+                width="30%">
+            <el-select v-model="allocRoleIds" multiple placeholder="请选择" size="small" style="width: 80%">
+                <el-option
+                        v-for="item in allRoleList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                </el-option>
+            </el-select>
+            <span slot="footer" class="dialog-footer">
+        <el-button @click="allocDialogVisible = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="handleAllocDialogConfirm()" size="small">确 定</el-button>
+      </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
-import { fetchUserData } from '@/api/index';
-import {formatDate} from '@/utils/date';
-import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/login';
+    import { fetchUserData } from '@/api/index';
+    import { formatDate } from '@/utils/date';
+    import { fetchAllRoleList } from '@/api/role';
+    import { createUser, deleteUser, getRoleByAdmin, updateUser ,allocRole} from '@/api/user';
 
-const defaultListQuery = {
+    const defaultListQuery = {
     username: null,
     page: 1,
     size: 10
@@ -187,20 +209,21 @@ export default {
             query: Object.assign({},defaultListQuery),
             tableData: [],
             multipleSelection: [],
-            delList: [],
             dialogVisible: false,
             listLoading:false,
             isEdit: false,
             total: 0,
             form: {},
+            allRoleList:[],
+            allocDialogVisible: false,
+            allocRoleIds:[],
+            allocAdminId:null,
             admin: Object.assign({}, defaultAdmin),
             idx: -1,
             id: -1
         };
     },
-    created() {
-        this.getData();
-    },
+
     filters: {
         formatTime(time) {
             if (time == null || time === '') {
@@ -220,15 +243,6 @@ export default {
                 return '账号异常';
             } else {
                 return '未激活';
-            }
-        },
-        formatPayType(value) {
-            if (value === 1) {
-                return '支付宝';
-            } else if (value === 2) {
-                return '微信';
-            } else {
-                return '未支付';
             }
         },
     },
@@ -257,6 +271,13 @@ export default {
                 this.total = res.data.total || 50;
             });
         },
+        handleSelectRole(index,row){
+            console.log(index)
+            console.log(row)
+            this.allocAdminId = row.id;
+            this.allocDialogVisible = true;
+            this.getRoleListByAdmin(row.id);
+        },
         // 触发搜索按钮
         handleSearch() {
             this.$set(this.query, 'page', 1);
@@ -269,7 +290,11 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    deleteAdmin({userId:row.id}).then(res =>{
+                    let ids=[];
+                    let params = new URLSearchParams();
+                    ids.push(row.id)
+                    params.append("ids",ids);
+                    deleteUser(params).then(res =>{
                         this.$message.success('删除成功');
                         this.tableData.splice(index, 1);
                     })
@@ -281,6 +306,24 @@ export default {
         // 多选操作
         handleSelectionChange(val) {
             this.multipleSelection = val;
+        },
+        handleAllocDialogConfirm(){
+            this.$confirm('是否要确认?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                let params = new URLSearchParams();
+                params.append("adminId", this.allocAdminId);
+                params.append("roleIds", this.allocRoleIds);
+                allocRole(params).then(response => {
+                    this.$message({
+                        message: '分配成功！',
+                        type: 'success'
+                    });
+                    this.allocDialogVisible = false;
+                })
+            })
         },
         //批量删除
         delAllSelection() {
@@ -308,7 +351,7 @@ export default {
                 }
                 params.append("ids",ids);
                 console.log(params)
-                deleteBatchAdmin(params).then(response=>{
+                deleteUser(params).then(response=>{
                     this.getData();
                     this.$message({
                         type: 'success',
@@ -316,16 +359,6 @@ export default {
                     });
                 });
             })
-
-
-            // const length = this.multipleSelection.length;
-            // let str = '';
-            // this.delList = this.delList.concat(this.multipleSelection);
-            // for (let i = 0; i < length; i++) {
-            //     str += this.multipleSelection[i].username + ' ';
-            // }
-            // this.$message.error(`删除了${str}`);
-            // this.multipleSelection = [];
         },
         //页面编辑
         handleDialogConfirm() {
@@ -344,7 +377,7 @@ export default {
                         this.getData();
                     })
                 } else {
-                    createAdmin(this.admin).then(response => {
+                    createUser(this.admin).then(response => {
                         this.$message({
                             message: '添加成功！',
                             type: 'success'
@@ -366,10 +399,38 @@ export default {
             this.query.page = 1;
             this.query.size = val;
             this.getData();
+        },
+
+        //根据用户ID获取所拥有的角色
+        getRoleListByAdmin(userId){
+            console.log(userId)
+            let params = new URLSearchParams()
+            params.append("userId",userId)
+            getRoleByAdmin(params).then(res=>{
+                let allocRoleList = res.data;
+                this.allocRoleIds = [];
+                if(allocRoleList != null && allocRoleList.length > 0){
+                    for(let i =0; i<allocRoleList.length;i++){
+                        this.allocRoleIds.push(allocRoleList[i].id)
+                    }
+                }
+            })
+        },
+
+        //获取全部角色
+        fetchAllRoleList(){
+            fetchAllRoleList().then(res=>{
+                this.allocRoleIds = res.data;
+            })
         }
 
 
+    },
+    created() {
+        this.getData();
+        this.fetchAllRoleList();
     }
+
 };
 </script>
 

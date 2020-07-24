@@ -114,17 +114,17 @@ export default new Router({
                 },
                 {
                     path: '/loginLog',
-                    component: () => import(/* webpackChunkName: "403" */ '../components/page/system/Log.vue'),
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/system/User.vue'),
                     meta: { title: '登陆日志' }
                 },
                 {
                     path: '/dict',
-                    component: () => import(/* webpackChunkName: "403" */ '../components/page/system/Log.vue'),
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/system/User.vue'),
                     meta: { title: '字典管理' }
                 },
                 {
                     path: '/businessLog',
-                    component: () => import(/* webpackChunkName: "403" */ '../components/page/system/Log.vue'),
+                    component: () => import(/* webpackChunkName: "403" */ '../components/page/system/User.vue'),
                     meta: { title: '业务日志' }
                 }
 
