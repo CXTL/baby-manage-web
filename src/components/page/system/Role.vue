@@ -3,7 +3,7 @@
 
         <el-card class="filter-container" shadow="never">
             <div class="handle-box">
-                <span>用户名: </span><el-input v-model="query.username" placeholder="用户名" class="handle-input mr10"></el-input>
+                <span>角色名称: </span><el-input v-model="query.name" placeholder="角色名称" class="handle-input mr10"></el-input>
 
                 <el-button
                         style="float:right"
@@ -47,35 +47,31 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="username"  label="用户名" align="center"></el-table-column>
-                <el-table-column prop="nickName"  label="昵称" align="center"></el-table-column>
-                <el-table-column label="手机号" prop="phone" align="center"></el-table-column>
-                <el-table-column label="头像(查看大图)" align="center">
-                    <template slot-scope="scope">
-                        <el-image
-                            class="table-td-thumb"
-                            :src="scope.row.headUrl"
-                            :preview-src-list="[scope.row.headUrl]"
-                        ></el-image>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="name"  label="名称" align="center"></el-table-column>
+                <el-table-column prop="remark"  label="备注" align="center"></el-table-column>
+                <el-table-column prop="userCount" label="用户数" align="center"></el-table-column>
                 <el-table-column label="创建时间" align="center">
                     <template slot-scope="scope">
                         {{scope.row.createTime | formatTime}}
                     </template>
                 </el-table-column>
-                <el-table-column label="状态" align="center">
+                <el-table-column label="是否启用" align="center">
                     <template slot-scope="scope">
-                        {{scope.row.status | formatStatus}}
+                        {{scope.row.isEnable | formatIsEnable}}
                     </template>
 
                 </el-table-column>
 
-                <el-table-column prop="email" label="邮箱" align="center"></el-table-column>
-                <el-table-column label="手机号" prop="phone" align="center"></el-table-column>
+
 
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
+                        <el-button size="mini"
+                                   type="text"
+                                   icon="el-icon-edit"
+                                   @click="handleUpdate(scope.$index, scope.row)">
+                            分配菜单
+                        </el-button>
                         <el-button size="mini"
                                    type="text"
                                    icon="el-icon-edit"
@@ -108,44 +104,26 @@
         </div>
 
         <el-dialog
-                :title="isEdit?'编辑用户':'添加用户'"
+                :title="isEdit?'编辑角色':'添加角色'"
                 :visible.sync="dialogVisible"
                 width="40%">
-            <el-form :model="admin"
-                     ref="adminForm"
+            <el-form :model="role"
+                     ref="roleForm"
                      label-width="150px" size="small">
-                    <el-form-item label="帐号：">
-                        <el-input v-model="admin.username" style="width: 250px"></el-input>
+                    <el-form-item label="名称：">
+                        <el-input v-model="role.name" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="昵称：">
-                        <el-input v-model="admin.nickName" style="width: 250px"></el-input>
-                    </el-form-item>
-                    <el-form-item label="邮箱：">
-                        <el-input v-model="admin.email" style="width: 250px"></el-input>
-                    </el-form-item>
-                    <el-form-item label="密码：">
-                        <el-input v-model="admin.password"  type="password"  style="width: 250px"></el-input>
-                    </el-form-item>
-                    <el-form-item label="手机号：">
-                        <el-input v-model="admin.phone"  style="width: 250px"></el-input>
-                    </el-form-item>
+                <el-form-item label="是否启用：">
+                    <el-radio-group v-model="role.isEnable">
+                        <el-radio :label="1">是</el-radio>
+                        <el-radio :label="0">否</el-radio>
+                    </el-radio-group>
+                </el-form-item>
                     <el-form-item label="备注：">
-                        <el-input v-model="admin.note"
+                        <el-input v-model="role.remark"
                                   type="textarea"
                                   :rows="5"
                                   style="width: 250px"></el-input>
-                    </el-form-item>
-                    <el-form-item label="性别：">
-                        <el-radio-group v-model="admin.sex">
-                            <el-radio :label=1>男</el-radio>
-                            <el-radio :label=0>女</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item label="是否激活：">
-                        <el-radio-group v-model="admin.status">
-                            <el-radio :label="1">是</el-radio>
-                            <el-radio :label="0">否</el-radio>
-                        </el-radio-group>
                     </el-form-item>
 
             </el-form>
@@ -159,25 +137,21 @@
 </template>
 
 <script>
-import { fetchUserData } from '@/api/index';
+import { fetchRoleData } from '@/api/index';
 import {formatDate} from '@/utils/date';
-import {fetchList,createAdmin,updateUser,updateStatus,deleteAdmin,getRoleByAdmin,allocRole,deleteBatchAdmin} from '@/api/login';
+import {createRole,updateRole,deleteRole} from '@/api/role';
 
 const defaultListQuery = {
-    username: null,
+    name: null,
     page: 1,
     size: 10
 }
 
-const defaultAdmin = {
+const defaultRole = {
     id: null,
-    username: null,
-    password: null,
-    nickName: null,
-    email: null,
-    note: null,
-    status: 1,
-    sex: null
+    name: null,
+    isEnable: 1,
+    remark: null
 };
 
 export default {
@@ -193,7 +167,7 @@ export default {
             isEdit: false,
             total: 0,
             form: {},
-            admin: Object.assign({}, defaultAdmin),
+            role: Object.assign({}, defaultRole),
             idx: -1,
             id: -1
         };
@@ -209,26 +183,11 @@ export default {
             let date = new Date(time);
             return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
         },
-        formatStatus(value) {
+        formatIsEnable(value) {
             if (value === 1) {
-                return '已激活';
-            } else if (value === 2) {
-                return '已锁定';
-            } else if (value === 3) {
-                return '已注销';
-            } else if (value === 4) {
-                return '账号异常';
+                return '启用';
             } else {
-                return '未激活';
-            }
-        },
-        formatPayType(value) {
-            if (value === 1) {
-                return '支付宝';
-            } else if (value === 2) {
-                return '微信';
-            } else {
-                return '未支付';
+                return '未启用';
             }
         },
     },
@@ -239,19 +198,19 @@ export default {
         handleUpdate(index, row) {
             this.dialogVisible = true;
             this.isEdit = true;
-            this.admin = Object.assign({},row);
+            this.role = Object.assign({},row);
         },
 
         handleAdd(index, row) {
             this.dialogVisible = true;
             this.isEdit = false;
-            this.admin = Object.assign({},defaultAdmin);
+            this.role = Object.assign({},defaultRole);
         },
 
         // 获取 easy-mock 的模拟数据
         getData() {
             this.listLoading=true;
-            fetchUserData(this.query).then(res => {
+            fetchRoleData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
                 this.total = res.data.total || 50;
@@ -269,7 +228,11 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    deleteAdmin({userId:row.id}).then(res =>{
+                    let ids=[];
+                    let params = new URLSearchParams();
+                    ids.push(row.id)
+                    params.append("ids",ids);
+                    deleteRole(params).then(res =>{
                         this.$message.success('删除成功');
                         this.tableData.splice(index, 1);
                     })
@@ -308,7 +271,7 @@ export default {
                 }
                 params.append("ids",ids);
                 console.log(params)
-                deleteBatchAdmin(params).then(response=>{
+                deleteRole(params).then(response=>{
                     this.getData();
                     this.$message({
                         type: 'success',
@@ -317,15 +280,6 @@ export default {
                 });
             })
 
-
-            // const length = this.multipleSelection.length;
-            // let str = '';
-            // this.delList = this.delList.concat(this.multipleSelection);
-            // for (let i = 0; i < length; i++) {
-            //     str += this.multipleSelection[i].username + ' ';
-            // }
-            // this.$message.error(`删除了${str}`);
-            // this.multipleSelection = [];
         },
         //页面编辑
         handleDialogConfirm() {
@@ -335,7 +289,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 if (this.isEdit) {
-                    updateUser(this.admin).then(response => {
+                    updateRole(this.role).then(response => {
                         this.$message({
                             message: '修改成功！',
                             type: 'success'
@@ -344,7 +298,7 @@ export default {
                         this.getData();
                     })
                 } else {
-                    createAdmin(this.admin).then(response => {
+                    createRole(this.role).then(response => {
                         this.$message({
                             message: '添加成功！',
                             type: 'success'
