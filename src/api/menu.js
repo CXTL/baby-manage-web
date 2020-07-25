@@ -26,3 +26,21 @@ export function deleteMenu(params) {
   })
 }
 
+export function fetchTreeList() {
+  return request({
+    url: '/api/menus/treeList',
+    method: 'get'
+  })
+}
+
+
+export function listMenuByRoleId(params) {
+  return request({
+    url: '/api/menus/listMenuByRoleId',
+    method: 'get',
+    params: params
+  })
+}
+
+
+

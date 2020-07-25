@@ -69,7 +69,7 @@
                         <el-button size="mini"
                                    type="text"
                                    icon="el-icon-edit"
-                                   @click="handleUpdate(scope.$index, scope.row)">
+                                   @click="handleSelectMenu(scope.$index, scope.row)">
                             分配菜单
                         </el-button>
                         <el-button size="mini"
@@ -192,6 +192,9 @@ export default {
         },
     },
     methods: {
+    handleSelectMenu(index,row){
+        this.$router.push({path:'/allocMenu',query:{roleId:row.id}})
+    },
         handleResetSearch() {
             this.query = Object.assign({}, defaultListQuery);
         },

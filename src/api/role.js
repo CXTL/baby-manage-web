@@ -33,3 +33,13 @@ export function fetchAllRoleList() {
     method: 'get'
   })
 }
+
+
+
+export function allocMenu(data) {
+  return request({
+    url: '/api/roles/allocMenu',
+    method: 'post',
+    data:data
+  })
+}
