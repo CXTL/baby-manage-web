@@ -67,7 +67,7 @@ export default {
                     title: '报表管理',
                     subs: [
                         {
-                            index: 'assetsReport',
+                            index: 'assetReport',
                             title: '资产报表'
                         }
                     ]
@@ -78,6 +78,10 @@ export default {
                     title: '财务管理',
                     subs: [
                         {
+                            index: 'invest',
+                            title: '投资管理'
+                        },
+                        {
                             index: 'account',
                             title: '帐套管理'
                         },
@@ -86,7 +90,7 @@ export default {
                             title: '会计科目'
                         },
                         {
-                            index: 'assets',
+                            index: 'asset',
                             title: '资产管理'
                         }
                     ]

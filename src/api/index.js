@@ -46,3 +46,12 @@ export const fetchSubjectData = query => {
         data: query
     });
 };
+
+//投资列表
+export const fetchInvestData = query => {
+    return request({
+        url: '/finance/invest/listByPage',
+        method: 'post',
+        data: query
+    });
+};
