@@ -36,3 +36,13 @@ export const fetchAccountData = query => {
         data: query
     });
 };
+
+
+//帐套列表
+export const fetchSubjectData = query => {
+    return request({
+        url: '/finance/subject/listByPage',
+        method: 'post',
+        data: query
+    });
+};

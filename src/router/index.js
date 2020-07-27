@@ -81,7 +81,7 @@ export default new Router({
                 },
                 {
                     path: '/subject',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/system/User.vue'),
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/finance/Subject.vue'),
                     meta: { title: '会计科目' }
                 },
                 {
