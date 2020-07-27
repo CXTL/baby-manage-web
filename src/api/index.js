@@ -3,7 +3,7 @@ import request from '@/utils/request';
 //用户列表
 export const fetchUserData = query => {
     return request({
-        url: '/api/users/listByPage',
+        url: '/system/users/listByPage',
         method: 'post',
         data: query
     });
@@ -12,7 +12,7 @@ export const fetchUserData = query => {
 //菜单列表
 export const fetchMenuData = query => {
     return request({
-        url: '/api/menus/listByPage',
+        url: '/system/menus/listByPage',
         method: 'post',
         data: query
     });
@@ -22,7 +22,16 @@ export const fetchMenuData = query => {
 //角色列表
 export const fetchRoleData = query => {
     return request({
-        url: '/api/roles/listByPage',
+        url: '/system/roles/listByPage',
+        method: 'post',
+        data: query
+    });
+};
+
+//帐套列表
+export const fetchAccountData = query => {
+    return request({
+        url: '/finance/account/listByPage',
         method: 'post',
         data: query
     });

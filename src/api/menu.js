@@ -3,7 +3,7 @@ import request from '@/utils/request'
 
 export function createMenu(data) {
   return request({
-    url: '/api/menus/addMenu',
+    url: '/system/menus/addMenu',
     method: 'post',
     data: data
   })
@@ -11,7 +11,7 @@ export function createMenu(data) {
 
 export function updateMenu(data) {
   return request({
-    url: '/api/menus/updateMenu',
+    url: '/system/menus/updateMenu',
     method: 'post',
     data: data
   })
@@ -20,7 +20,7 @@ export function updateMenu(data) {
 
 export function deleteMenu(params) {
   return request({
-    url: '/api/menus/deleteMenu',
+    url: '/system/menus/deleteMenu',
     method: 'post',
     params: params
   })
@@ -28,7 +28,7 @@ export function deleteMenu(params) {
 
 export function fetchTreeList() {
   return request({
-    url: '/api/menus/treeList',
+    url: '/system/menus/treeList',
     method: 'get'
   })
 }
@@ -36,7 +36,7 @@ export function fetchTreeList() {
 
 export function listMenuByRoleId(params) {
   return request({
-    url: '/api/menus/listMenuByRoleId',
+    url: '/system/menus/listMenuByRoleId',
     method: 'get',
     params: params
   })

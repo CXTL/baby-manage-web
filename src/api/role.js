@@ -4,7 +4,7 @@ import request from '@/utils/request'
 
 export function createRole(data) {
   return request({
-    url: '/api/roles/addRole',
+    url: '/system/roles/addRole',
     method: 'post',
     data: data
   })
@@ -12,7 +12,7 @@ export function createRole(data) {
 
 export function updateRole(data) {
   return request({
-    url: '/api/roles/updateRole',
+    url: '/system/roles/updateRole',
     method: 'post',
     data: data
   })
@@ -21,7 +21,7 @@ export function updateRole(data) {
 
 export function deleteRole(params) {
   return request({
-    url: '/api/roles/deleteRole',
+    url: '/system/roles/deleteRole',
     method: 'post',
     params: params
   })
@@ -29,7 +29,7 @@ export function deleteRole(params) {
 
 export function fetchAllRoleList() {
   return request({
-    url: '/api/roles/listAll',
+    url: '/system/roles/listAll',
     method: 'get'
   })
 }
@@ -38,7 +38,7 @@ export function fetchAllRoleList() {
 
 export function allocMenu(data) {
   return request({
-    url: '/api/roles/allocMenu',
+    url: '/system/roles/allocMenu',
     method: 'post',
     data:data
   })

@@ -63,6 +63,36 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-cascades',
+                    index: 'report',
+                    title: '报表管理',
+                    subs: [
+                        {
+                            index: 'assetsReport',
+                            title: '资产报表'
+                        }
+                    ]
+                },
+                {
+                    icon: 'el-icon-lx-cascades',
+                    index: 'finance',
+                    title: '财务管理',
+                    subs: [
+                        {
+                            index: 'account',
+                            title: '帐套管理'
+                        },
+                        {
+                            index: 'subject',
+                            title: '会计科目'
+                        },
+                        {
+                            index: 'assets',
+                            title: '资产管理'
+                        }
+                    ]
+                },
+                {
+                    icon: 'el-icon-lx-cascades',
                     index: 'system',
                     title: '系统管理',
                     subs: [
@@ -96,44 +126,6 @@ export default {
                     icon: 'el-icon-lx-global',
                     index: 'i18n',
                     title: '国际化功能'
-                },
-                {
-                    icon: 'el-icon-lx-warn',
-                    index: '7',
-                    title: '错误处理',
-                    subs: [
-                        {
-                            index: 'permission',
-                            title: '权限测试'
-                        },
-                        {
-                            index: '404',
-                            title: '404页面'
-                        }
-                    ]
-                },
-                {
-                    icon: 'el-icon-lx-cascades',
-                    index: 'finance',
-                    title: '财务管理',
-                    subs: [
-                        {
-                            index: 'account',
-                            title: '分账管理'
-                        },
-                        {
-                            index: 'payAndReceive',
-                            title: '应付应收'
-                        },
-                        {
-                            index: 'assets',
-                            title: '资产管理'
-                        },
-                        {
-                            index: 'cost',
-                            title: '费用管理'
-                        }
-                    ]
                 }
             ]
         };
