@@ -55,3 +55,13 @@ export const fetchInvestData = query => {
         data: query
     });
 };
+
+
+//资产列表
+export const fetchAssetData = query => {
+    return request({
+        url: '/finance/asset/listByPage',
+        method: 'post',
+        data: query
+    });
+};

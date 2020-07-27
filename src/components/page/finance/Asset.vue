@@ -3,7 +3,7 @@
 
         <el-card class="filter-container" shadow="never">
             <div class="handle-box">
-                <span>科目编号: </span><el-input v-model="query.subjectCode" placeholder="科目编号" class="handle-input mr10"></el-input>
+                <span>帐套编号: </span><el-input v-model="query.accountCode" placeholder="帐套编号" class="handle-input mr10"></el-input>
 
                 <el-button
                         style="float:right"
@@ -47,20 +47,17 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column  label="ID" prop="id" width="55" align="center"></el-table-column>
-                <el-table-column  label="科目编号" prop="subjectCode"  align="center"></el-table-column>
-                <el-table-column  label="科目名称" prop="subjectName"  align="center"></el-table-column>
-                <el-table-column label="父科目编号" prop="parentCode" align="center"></el-table-column>
-                <el-table-column label="科目类型" align="center">
+                <el-table-column  label="帐套编号" prop="accountCode"  align="center"></el-table-column>
+                <el-table-column  label="科目编码" prop="subjectCode"  align="center"></el-table-column>
+                <el-table-column label="应收金额" prop="receiveAmount" align="center"></el-table-column>
+                <el-table-column label="应付金额" prop="payAmount" align="center"></el-table-column>
+                <el-table-column label="实收金额" prop="realReceiveAmount" align="center"></el-table-column>
+                <el-table-column label="实付金额" prop="realPayAmount" align="center"></el-table-column>
+                <el-table-column label="资产类型" align="center">
                     <template slot-scope="scope">
-                        {{scope.row.subjectType | formatType}}
+                        {{scope.row.type | formatType}}
                     </template>
                 </el-table-column>
-                <el-table-column label="借贷方向" align="center">
-                    <template slot-scope="scope">
-                        {{scope.row.borrowFlag | formatBorrow}}
-                    </template>
-                </el-table-column>
-
 
                 <el-table-column label="创建时间" align="center">
                     <template slot-scope="scope">
@@ -104,43 +101,42 @@
         </div>
 
         <el-dialog
-                :title="isEdit?'编辑科目':'添加科目'"
+                :title="isEdit?'编辑投资人信息':'添加投资人信息'"
                 :visible.sync="dialogVisible"
                 width="40%">
-            <el-form :model="subject"
-                     ref="subjectForm"
+            <el-form :model="asset"
+                     ref="assetForm"
                      label-width="150px" size="small">
-                    <el-form-item label="科目编号：">
-                        <el-input v-model="subject.subjectCode" style="width: 250px"></el-input>
+                    <el-form-item label="帐套编号：">
+                        <el-input v-model="asset.accountCode" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="科目名称：">
-                        <el-input v-model="subject.subjectName" style="width: 250px"></el-input>
+                    <el-form-item label="科目编码：">
+                        <el-input v-model="asset.subjectCode" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="父科目编号：">
-                        <el-input v-model="subject.parentCode" style="width: 250px"></el-input>
+                    <el-form-item label="应收金额：">
+                        <el-input v-model="asset.receiveAmount" style="width: 250px"></el-input>
                     </el-form-item>
 
-                <el-form-item label="科目类型：">
-                    <el-radio-group  v-model="subject.subjectType">
-                        <el-radio :label="1">资产</el-radio>
-                        <el-radio :label="2">负载</el-radio>
-                        <el-radio :label="3">权益</el-radio>
-                        <el-radio :label="4">成本</el-radio>
-                        <el-radio :label="5">其他</el-radio>
+                    <el-form-item label="应付金额：">
+                        <el-input v-model="asset.payAmount" style="width: 250px"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="实收金额：">
+                        <el-input v-model="asset.realReceiveAmount" style="width: 250px"></el-input>
+                    </el-form-item>
+                    <el-form-item label="实付金额：">
+                        <el-input v-model="asset.realPayAmount" style="width: 250px"></el-input>
+                    </el-form-item>
+
+                <el-form-item label="资产类型：">
+                    <el-radio-group v-model="asset.type">
+                        <el-radio :label="1">收入</el-radio>
+                        <el-radio :label="2">支出</el-radio>
                     </el-radio-group>
                 </el-form-item>
-
-
-                <el-form-item label="借贷方向：">
-                    <el-radio-group  v-model="subject.borrowFlag">
-                        <el-radio :label="0">借</el-radio>
-                        <el-radio :label="1">贷</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-
 
                     <el-form-item label="备注：">
-                        <el-input v-model="subject.remark"
+                        <el-input v-model="asset.remark"
                                   type="textarea"
                                   :rows="5"
                                   style="width: 250px"></el-input>
@@ -156,23 +152,25 @@
 </template>
 
 <script>
-    import { fetchSubjectData } from '@/api/index';
+    import { fetchAssetData } from '@/api/index';
     import { formatDate } from '@/utils/date';
-    import { createSubject, deleteSubject,  updateSubject} from '@/api/subject';
+    import { createAsset, deleteAsset,  updateAsset} from '@/api/asset';
 
     const defaultListQuery = {
-    subjectCode: null,
+    accountCode: null,
     page: 1,
     size: 10
 }
 
-const defaultSubject = {
+const defaultAsset = {
     id: null,
+    accountCode: null,
     subjectCode: null,
-    subjectName: null,
-    parentCode: null,
-    subjectType: null,
-    borrowFlag: null,
+    receiveAmount: null,
+    payAmount: null,
+    realReceiveAmount: null,
+    realPayAmount: null,
+    type: null,
     remark: null
 };
 
@@ -188,7 +186,7 @@ export default {
             isEdit: false,
             total: 0,
             form: {},
-            subject: Object.assign({}, defaultSubject),
+            asset: Object.assign({}, defaultAsset),
             idx: -1,
             id: -1
         };
@@ -202,25 +200,12 @@ export default {
             let date = new Date(time);
             return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
         },
+
         formatType(value) {
             if (value === 1) {
-                return '资产';
-            }else if (value === 2){
-                return '负载';
-            }else if (value === 3){
-                return '权益';
-            }else if (value === 4){
-                return '成本';
-            }
-            else {
-                return '其他';
-            }
-        },
-        formatBorrow(value) {
-            if (value === 1) {
-                return '贷';
-            }else if (value === 0) {
-                return '借';
+                return '收入';
+            }else if (value === 2) {
+                return '支出';
             }
             else {
                 return 'N/A';
@@ -234,19 +219,19 @@ export default {
         handleUpdate(index, row) {
             this.dialogVisible = true;
             this.isEdit = true;
-            this.subject = Object.assign({},row);
+            this.asset = Object.assign({},row);
         },
 
         handleAdd(index, row) {
             this.dialogVisible = true;
             this.isEdit = false;
-            this.subject = Object.assign({},defaultSubject);
+            this.asset = Object.assign({},defaultAsset);
         },
 
         // 获取 easy-mock 的模拟数据
         getData() {
             this.listLoading=true;
-            fetchSubjectData(this.query).then(res => {
+            fetchAssetData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
                 this.total = res.data.total || 50;
@@ -269,7 +254,7 @@ export default {
                     let params = new URLSearchParams();
                     ids.push(row.id)
                     params.append("ids",ids);
-                    deleteSubject(params).then(res =>{
+                    deleteAsset(params).then(res =>{
                         this.$message.success('删除成功');
                         this.tableData.splice(index, 1);
                     })
@@ -308,7 +293,7 @@ export default {
                 }
                 params.append("ids",ids);
                 console.log(params)
-                deleteSubject(params).then(response=>{
+                deleteAsset(params).then(response=>{
                     this.getData();
                     this.$message({
                         type: 'success',
@@ -325,7 +310,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 if (this.isEdit) {
-                    updateSubject(this.subject).then(response => {
+                    updateAsset(this.asset).then(response => {
                         this.$message({
                             message: '修改成功！',
                             type: 'success'
@@ -334,7 +319,7 @@ export default {
                         this.getData();
                     })
                 } else {
-                    createSubject(this.subject).then(response => {
+                    createAsset(this.asset).then(response => {
                         this.$message({
                             message: '添加成功！',
                             type: 'success'
