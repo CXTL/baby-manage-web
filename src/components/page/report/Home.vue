@@ -2,25 +2,36 @@
   <div class="app-container">
     <div class="total-layout">
       <el-row :gutter="20">
-        <el-col :span="8">
+        <el-col :span="6">
           <div class="total-frame">
             <img :src="img_home_order" class="total-icon">
-            <div class="total-title">今日收入: ￥200</div>
-            <div class="total-title">昨日收入: ￥100</div>
+            <div class="total-title">今日收入: ￥{{homeReportData.incomeToday}}</div>
+            <div class="total-title">昨日收入: ￥{{homeReportData.incomeYesterday}}</div>
+            <div class="total-title">同比昨日:  {{homeReportData.rateIncome}}%</div>
           </div>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="6">
           <div class="total-frame">
             <img :src="img_home_today_amount" class="total-icon">
-            <div class="total-title">今日支出: ￥200</div>
-            <div class="total-title">昨日支出: ￥100</div>
+            <div class="total-title">今日支出: ￥{{homeReportData.expenditureToday}}</div>
+            <div class="total-title">昨日支出: ￥{{homeReportData.expenditureYesterday}}</div>
+            <div class="total-title">同比昨日: {{homeReportData.rateExpenditure}}%</div>
           </div>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="6">
           <div class="total-frame">
             <img :src="img_home_yesterday_amount" class="total-icon">
-            <div class="total-title">今日利润: ￥200</div>
-            <div class="total-title">昨日利润: ￥100</div>
+            <div class="total-title">今日利润: ￥{{homeReportData.profitToday}}</div>
+            <div class="total-title">昨日利润: ￥{{homeReportData.profitYesterday}}</div>
+            <div class="total-title">同比昨日: {{homeReportData.rateProfit}}%</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="total-frame">
+            <img :src="img_home_order" class="total-icon">
+            <div class="total-title">今日资产: ￥{{homeReportData.assetToday}}</div>
+            <div class="total-title">昨日资产: ￥{{homeReportData.assetYesterday}}</div>
+            <div class="total-title">同比昨日: +{{homeReportData.rateAsset}}%</div>
           </div>
         </el-col>
       </el-row>
@@ -53,43 +64,43 @@
     <div class="statistics-layout">
       <div class="layout-title">资产统计</div>
       <el-row>
-        <el-col :span="4">
-          <div style="padding: 20px">
-            <div>
-              <div style="color: #909399;font-size: 14px">本月总资产</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">10000</div>
-              <div>
-                <span class="color-success" style="font-size: 14px">+10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>
-              </div>
-            </div>
-            <div style="margin-top: 20px;">
-              <div style="color: #909399;font-size: 14px">本周总资产</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">1000</div>
-              <div>
-                <span class="color-danger" style="font-size: 14px">-10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>
-              </div>
-            </div>
-            <div style="margin-top: 20px;">
-              <div style="color: #909399;font-size: 14px">本月总利润</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">100000</div>
-              <div>
-                <span class="color-success" style="font-size: 14px">+10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>
-              </div>
-            </div>
-            <div style="margin-top: 20px;">
-              <div style="color: #909399;font-size: 14px">本周总利润</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">50000</div>
-              <div>
-                <span class="color-danger" style="font-size: 14px">-10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>
-              </div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :span="20">
+<!--        <el-col :span="4">-->
+<!--          <div style="padding: 20px">-->
+<!--            <div>-->
+<!--              <div style="color: #909399;font-size: 14px">本月总资产</div>-->
+<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">10000</div>-->
+<!--              <div>-->
+<!--                <span class="color-success" style="font-size: 14px">+10%</span>-->
+<!--                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div style="margin-top: 20px;">-->
+<!--              <div style="color: #909399;font-size: 14px">本周总资产</div>-->
+<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">1000</div>-->
+<!--              <div>-->
+<!--                <span class="color-danger" style="font-size: 14px">-10%</span>-->
+<!--                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div style="margin-top: 20px;">-->
+<!--              <div style="color: #909399;font-size: 14px">本月总利润</div>-->
+<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">100000</div>-->
+<!--              <div>-->
+<!--                <span class="color-success" style="font-size: 14px">+10%</span>-->
+<!--                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div style="margin-top: 20px;">-->
+<!--              <div style="color: #909399;font-size: 14px">本周总利润</div>-->
+<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">50000</div>-->
+<!--              <div>-->
+<!--                <span class="color-danger" style="font-size: 14px">-10%</span>-->
+<!--                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </el-col>-->
+        <el-col>
           <div style="padding: 10px;border-left:1px solid #DCDFE6">
             <el-date-picker
               style="float: right;z-index: 1"
@@ -124,30 +135,61 @@
   import img_home_order from '@/assets/img/home_order.png';
   import img_home_today_amount from '@/assets/img/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
+  import { fetchHomeReportData} from '@/api/home';
   const DATA_FROM_BACKEND = {
-    columns: ['date', 'orderCount','orderAmount'],
+    columns: ['date', 'test', 'orderCount','orderAmount'],
     rows: [
-      {date: '2018-11-01', orderCount: 10, orderAmount: 1093},
-      {date: '2018-11-02', orderCount: 20, orderAmount: 2230},
-      {date: '2018-11-03', orderCount: 33, orderAmount: 3623},
-      {date: '2018-11-04', orderCount: 50, orderAmount: 6423},
-      {date: '2018-11-05', orderCount: 80, orderAmount: 8492},
-      {date: '2018-11-06', orderCount: 60, orderAmount: 6293},
-      {date: '2018-11-07', orderCount: 20, orderAmount: 2293},
-      {date: '2018-11-08', orderCount: 60, orderAmount: 6293},
-      {date: '2018-11-09', orderCount: 50, orderAmount: 5293},
-      {date: '2018-11-10', orderCount: 30, orderAmount: 3293},
-      {date: '2018-11-11', orderCount: 20, orderAmount: 2293},
-      {date: '2018-11-12', orderCount: 80, orderAmount: 8293},
-      {date: '2018-11-13', orderCount: 100, orderAmount: 10293},
-      {date: '2018-11-14', orderCount: 10, orderAmount: 1293},
-      {date: '2018-11-15', orderCount: 40, orderAmount: 4293}
+      {date: '2018-11-01',test:1, orderCount: 1055, orderAmount: 1093},
+      {date: '2018-11-02',test:1233, orderCount: 206, orderAmount: 2230},
+      {date: '2018-11-03',test:14, orderCount: 3377, orderAmount: 3623},
+      {date: '2018-11-04',test:155, orderCount: 508, orderAmount: 6423},
+      {date: '2018-11-05',test:661, orderCount: 890, orderAmount: 8492},
+      {date: '2018-11-06',test:1, orderCount: 60, orderAmount: 6293},
+      {date: '2018-11-07',test:1, orderCount: 20, orderAmount: 2293},
+      {date: '2018-11-08',test:1, orderCount: 60, orderAmount: 6293},
+      {date: '2018-11-09',test:1, orderCount: 50, orderAmount: 5293},
+      {date: '2018-11-10',test:1, orderCount: 30, orderAmount: 3293},
+      {date: '2018-11-11',test:1, orderCount: 20, orderAmount: 2293},
+      {date: '2018-11-12',test:1, orderCount: 80, orderAmount: 8293},
+      {date: '2018-11-13',test:1, orderCount: 100, orderAmount: 10293},
+      {date: '2018-11-14',test:1, orderCount: 10, orderAmount: 1293},
+      {date: '2018-11-15',test:1, orderCount: 40, orderAmount: 4293}
     ]
   };
+
+ const defaultListQuery ={
+    accountCode: null,
+    endTime:'',
+    startTime: ''
+  };
+
+  const homeReportData ={
+    incomeToday:0,
+    incomeYesterday:0,
+    rateIncome:0,
+
+    expenditureToday:0,
+    expenditureYesterday:0,
+    rateExpenditure:0,
+
+    profitToday:0,
+    profitYesterday:0,
+    rateProfit:0,
+
+
+    assetToday:0,
+    assetYesterday:0,
+    rateAsset:0
+  }
+
   export default {
     name: 'home',
     data() {
       return {
+
+        homeReportData: Object.assign({}, homeReportData),
+        query: Object.assign({},defaultListQuery),
+
         pickerOptions: {
           shortcuts: [{
             text: '最近一周',
@@ -178,7 +220,7 @@
           xAxisType: 'time',
           area:true,
           axisSite: { right: ['orderAmount']},
-        labelMap: {'orderCount': '收入', 'orderAmount': '支出'}},
+        labelMap: {'orderCount': '收入', 'orderAmount': '支出', 'test': '测试'}},
         chartData: {
           columns: [],
           rows: []
@@ -191,6 +233,7 @@
       }
     },
     created(){
+      this.getHomeReportData();
       this.initOrderCountDate();
       this.getData();
     },
@@ -207,10 +250,18 @@
         end.setTime(start.getTime() + 1000 * 60 * 60 * 24 * 7);
         this.orderCountDate=[start,end];
       },
+
+      //获取表头数据
+      getHomeReportData(){
+        fetchHomeReportData(this.query).then(res => {
+          this.homeReportData = res.data;
+        });
+      },
+
       getData(){
         setTimeout(() => {
           this.chartData = {
-            columns: ['date', 'orderCount','orderAmount'],
+            columns: ['date', 'orderCount','orderAmount','test'],
             rows: []
           };
           for(let i=0;i<DATA_FROM_BACKEND.rows.length;i++){
@@ -224,7 +275,7 @@
           }
           this.dataEmpty = false;
           this.loading = false
-        }, 1000)
+        }, 500)
       }
     }
   }
