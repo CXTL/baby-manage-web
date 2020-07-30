@@ -47,7 +47,9 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column  label="ID" prop="id" width="55" align="center"></el-table-column>
-                <el-table-column  label="帐套编号" prop="accountCode"  align="center"></el-table-column>
+                <el-table-column  label="帐套编号"  prop="accountCode" align="center">
+
+                </el-table-column>
                 <el-table-column  label="投资人名称" prop="investName"  align="center"></el-table-column>
                 <el-table-column label="投资款" prop="investFund" align="center"></el-table-column>
                 <el-table-column label="投资总额" prop="investAmount" align="center"></el-table-column>
@@ -101,9 +103,19 @@
             <el-form :model="invest"
                      ref="investForm"
                      label-width="150px" size="small">
-                    <el-form-item label="帐套编号：">
-                        <el-input v-model="invest.accountCode" style="width: 250px"></el-input>
-                    </el-form-item>
+
+
+
+                <el-form-item label="帐套名称：">
+                    <el-select v-model="invest.accountCode" placeholder="请选择" style="width: 250px">
+                        <el-option
+                                v-for="item in accountData"
+                                :key="item.id"
+                                :label="item.accountName"
+                                :value="item.accountCode">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                     <el-form-item label="投资人名称：">
                         <el-input v-model="invest.investName" style="width: 250px"></el-input>
                     </el-form-item>
@@ -118,6 +130,7 @@
                     <el-form-item label="投资比例：">
                         <el-input v-model="invest.investRatio" style="width: 250px"></el-input>
                     </el-form-item>
+
 
 
                     <el-form-item label="备注：">
@@ -137,7 +150,7 @@
 </template>
 
 <script>
-    import { fetchInvestData } from '@/api/index';
+    import { fetchInvestData,listAccountData } from '@/api/index';
     import { formatDate } from '@/utils/date';
     import { createInvest, deleteInvest,  updateInvest} from '@/api/invest';
 
@@ -161,6 +174,7 @@ export default {
     name: 'basetable',
     data() {
         return {
+            accountData:[],
             query: Object.assign({},defaultListQuery),
             tableData: [],
             multipleSelection: [],
@@ -339,10 +353,20 @@ export default {
             this.getData();
         },
 
+        // 获取帐套列表
+        getAccountData() {
+            listAccountData().then(res=>{
+                this.accountData = res.data
+                console.log(res.data)
+                console.log(this.accountData)
+            })
+        },
+
 
 
     },
     created() {
+        this.getAccountData();
         this.getData();
     }
 

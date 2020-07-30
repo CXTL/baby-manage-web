@@ -65,3 +65,12 @@ export const fetchAssetData = query => {
         data: query
     });
 };
+
+
+//获取全部帐套信息
+export const listAccountData = () => {
+    return request({
+        url: '/finance/account/listAll',
+        method: 'get'
+    });
+};
