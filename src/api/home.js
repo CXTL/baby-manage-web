@@ -10,3 +10,13 @@ export const fetchHomeReportData = query => {
     data: query
   });
 };
+
+
+//获取首页统计图数据
+export const fetchHomeChartReportData = query => {
+  return request({
+    url: '/report/home/getHomeChartData',
+    method: 'post',
+    data: query
+  });
+};

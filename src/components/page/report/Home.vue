@@ -64,42 +64,6 @@
     <div class="statistics-layout">
       <div class="layout-title">资产统计</div>
       <el-row>
-<!--        <el-col :span="4">-->
-<!--          <div style="padding: 20px">-->
-<!--            <div>-->
-<!--              <div style="color: #909399;font-size: 14px">本月总资产</div>-->
-<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">10000</div>-->
-<!--              <div>-->
-<!--                <span class="color-success" style="font-size: 14px">+10%</span>-->
-<!--                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div style="margin-top: 20px;">-->
-<!--              <div style="color: #909399;font-size: 14px">本周总资产</div>-->
-<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">1000</div>-->
-<!--              <div>-->
-<!--                <span class="color-danger" style="font-size: 14px">-10%</span>-->
-<!--                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div style="margin-top: 20px;">-->
-<!--              <div style="color: #909399;font-size: 14px">本月总利润</div>-->
-<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">100000</div>-->
-<!--              <div>-->
-<!--                <span class="color-success" style="font-size: 14px">+10%</span>-->
-<!--                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div style="margin-top: 20px;">-->
-<!--              <div style="color: #909399;font-size: 14px">本周总利润</div>-->
-<!--              <div style="color: #606266;font-size: 24px;padding: 10px 0">50000</div>-->
-<!--              <div>-->
-<!--                <span class="color-danger" style="font-size: 14px">-10%</span>-->
-<!--                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </el-col>-->
         <el-col>
           <div style="padding: 10px;border-left:1px solid #DCDFE6">
             <el-date-picker
@@ -131,31 +95,11 @@
 </template>
 
 <script>
-  import {str2Date} from '@/utils/date';
+  import {str2Date,getFirstTimestamp, getLastTimestamp} from '@/utils/date';
   import img_home_order from '@/assets/img/home_order.png';
   import img_home_today_amount from '@/assets/img/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
-  import { fetchHomeReportData} from '@/api/home';
-  const DATA_FROM_BACKEND = {
-    columns: ['date', 'test', 'orderCount','orderAmount'],
-    rows: [
-      {date: '2018-11-01',test:1, orderCount: 1055, orderAmount: 1093},
-      {date: '2018-11-02',test:1233, orderCount: 206, orderAmount: 2230},
-      {date: '2018-11-03',test:14, orderCount: 3377, orderAmount: 3623},
-      {date: '2018-11-04',test:155, orderCount: 508, orderAmount: 6423},
-      {date: '2018-11-05',test:661, orderCount: 890, orderAmount: 8492},
-      {date: '2018-11-06',test:1, orderCount: 60, orderAmount: 6293},
-      {date: '2018-11-07',test:1, orderCount: 20, orderAmount: 2293},
-      {date: '2018-11-08',test:1, orderCount: 60, orderAmount: 6293},
-      {date: '2018-11-09',test:1, orderCount: 50, orderAmount: 5293},
-      {date: '2018-11-10',test:1, orderCount: 30, orderAmount: 3293},
-      {date: '2018-11-11',test:1, orderCount: 20, orderAmount: 2293},
-      {date: '2018-11-12',test:1, orderCount: 80, orderAmount: 8293},
-      {date: '2018-11-13',test:1, orderCount: 100, orderAmount: 10293},
-      {date: '2018-11-14',test:1, orderCount: 10, orderAmount: 1293},
-      {date: '2018-11-15',test:1, orderCount: 40, orderAmount: 4293}
-    ]
-  };
+  import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/home';
 
  const defaultListQuery ={
     accountCode: null,
@@ -196,9 +140,9 @@
             onClick(picker) {
               const end = new Date();
               let start = new Date();
-              start.setFullYear(2018);
-              start.setMonth(10);
-              start.setDate(1);
+              start.setFullYear(start.getFullYear());
+              start.setMonth(start.getMonth());
+              start.setDate(start.getDay());
               end.setTime(start.getTime() + 3600 * 1000 * 24 * 7);
               picker.$emit('pick', [start, end]);
             }
@@ -207,9 +151,9 @@
             onClick(picker) {
               const end = new Date();
               let start = new Date();
-              start.setFullYear(2018);
-              start.setMonth(10);
-              start.setDate(1);
+              start.setFullYear(start.getFullYear());
+              start.setMonth(start.getMonth());
+              start.setDate(start.getDay());
               end.setTime(start.getTime() + 3600 * 1000 * 24 * 30);
               picker.$emit('pick', [start, end]);
             }
@@ -218,9 +162,9 @@
         orderCountDate: '',
         chartSettings: {
           xAxisType: 'time',
-          area:true,
-          axisSite: { right: ['orderAmount']},
-        labelMap: {'orderCount': '收入', 'orderAmount': '支出', 'test': '测试'}},
+          area:false,
+          axisSite: { right: ['totalAsset']},
+        labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出', 'totalAsset': '总资产' ,'totalProfit': '总利润'}},
         chartData: {
           columns: [],
           rows: []
@@ -243,9 +187,9 @@
       },
       initOrderCountDate(){
         let start = new Date();
-        start.setFullYear(2018);
-        start.setMonth(10);
-        start.setDate(1);
+        start.setFullYear(start.getFullYear());
+        start.setMonth(start.getMonth());
+        start.setDate(start.getDay());
         const end = new Date();
         end.setTime(start.getTime() + 1000 * 60 * 60 * 24 * 7);
         this.orderCountDate=[start,end];
@@ -260,19 +204,16 @@
 
       getData(){
         setTimeout(() => {
-          this.chartData = {
-            columns: ['date', 'orderCount','orderAmount','test'],
-            rows: []
-          };
-          for(let i=0;i<DATA_FROM_BACKEND.rows.length;i++){
-            let item=DATA_FROM_BACKEND.rows[i];
-            let currDate=str2Date(item.date);
-            let start=this.orderCountDate[0];
-            let end=this.orderCountDate[1];
-            if(currDate.getTime()>=start.getTime()&&currDate.getTime()<=end.getTime()){
-              this.chartData.rows.push(item);
-            }
-          }
+          this.query.startTime = getFirstTimestamp(this.orderCountDate[0]);
+          this.query.endTime = getLastTimestamp(this.orderCountDate[1]);
+          fetchHomeChartReportData(this.query).then(res => {
+            this.chartData = {
+              columns: ['date', 'totalIncome','totalExpenditure','totalAsset','totalProfit'],
+              rows: []
+            };
+            this.chartData.rows = res.data
+          });
+
           this.dataEmpty = false;
           this.loading = false
         }, 500)

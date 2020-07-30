@@ -40,3 +40,12 @@ export function str2Date(dateStr, separator) {
   let date = new Date(year, month - 1, day);
   return date;
 }
+
+export function getFirstTimestamp(time) {
+  return new Date(time.toLocaleDateString()).getTime();
+}
+
+export function getLastTimestamp(time) {
+  return new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1;
+}
+
