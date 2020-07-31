@@ -116,7 +116,7 @@
 
             <el-card class="form-container" shadow="never">
                 <el-tree
-                        :data="menuTreeList"
+                        :data="subjectTreeList"
                         default-expand-all
                         :filter-node-method="filterNode"
                         class="filter-tree"
@@ -216,7 +216,7 @@ export default {
     name: 'basetable',
     data() {
         return {
-            menuTreeList: [],
+            subjectTreeList: [],
             defaultProps: {
                 children: 'children',
                 label: 'subjectName'
@@ -314,7 +314,7 @@ export default {
         //查询科目树
         treeList() {
             fetchTreeList().then(response => {
-                this.menuTreeList = response.data;
+                this.subjectTreeList = response.data;
             });
         },
 
