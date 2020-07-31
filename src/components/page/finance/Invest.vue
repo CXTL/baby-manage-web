@@ -81,7 +81,7 @@
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column  label="ID" prop="id" width="55" align="center"></el-table-column>
                 <el-table-column  label="帐套名称"  prop="accountName" align="center"></el-table-column>
-                <el-table-column  label="科目编号"  prop="subjectCode" align="center"></el-table-column>
+                <el-table-column  label="科目名称"  prop="subjectName" align="center"></el-table-column>
                 <el-table-column  label="投资人名称" prop="investName"  align="center"></el-table-column>
                 <el-table-column label="投资款" prop="investFund" align="center"></el-table-column>
                 <el-table-column label="投资总额" prop="investAmount" align="center"></el-table-column>
@@ -149,7 +149,9 @@
                     </el-select>
                 </el-form-item>
                     <el-form-item label="科目编号：">
-                        <el-input v-model="invest.subjectCode" style="width: 250px"></el-input>
+                        <el-input v-model="invest.subjectName" style="width: 250px">
+                            <el-button slot="append" icon="el-icon-search" @click="handleClickSubject()"></el-button>
+                        </el-input>
                     </el-form-item>
                     <el-form-item label="投资人名称：">
                         <el-input v-model="invest.investName" style="width: 250px"></el-input>
@@ -181,6 +183,34 @@
         <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
       </span>
         </el-dialog>
+
+
+        <el-dialog
+                :title="'选择科目'"
+                :visible.sync="dialogSubjectVisible"
+                width="40%">
+
+
+            <el-card class="form-container" shadow="never">
+                <el-tree
+                        :data="subjectTreeList"
+                        default-expand-all
+                        :filter-node-method="filterNode"
+                        class="filter-tree"
+                        highlight-current
+                        ref="tree2"
+                        :props="defaultProps">
+                </el-tree>
+                <div style="margin-top: 20px" align="center">
+                    <el-button type="primary" @click="handleSave()">确定</el-button>
+                    <el-button @click="handleClear()">取消</el-button>
+                </div>
+
+            </el-card>
+
+        </el-dialog>
+
+
     </div>
 </template>
 
@@ -188,6 +218,7 @@
     import { fetchInvestData,listAccountData } from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import { createInvest, deleteInvest,  updateInvest} from '@/api/invest';
+    import { fetchTreeList} from '@/api/subject';
 
     const defaultListQuery = {
     accountCode: null,
@@ -201,6 +232,7 @@ const defaultInvest = {
     id: null,
     accountCode: null,
     subjectCode: null,
+    subjectName: null,
     investName: null,
     investFund: null,
     investAmount: null,
@@ -212,6 +244,12 @@ export default {
     name: 'basetable',
     data() {
         return {
+            subjectTreeList:[],
+            defaultProps: {
+                children: 'children',
+                label: 'subjectName'
+            },
+            dialogSubjectVisible: false,
             accountData:[],
             pickerOptions: {
                 shortcuts: [{
@@ -290,6 +328,42 @@ export default {
         handleDateChange(){
             this.getData();
         },
+        //查询科目树
+        treeList() {
+            fetchTreeList().then(response => {
+                this.subjectTreeList = response.data;
+            });
+        },
+        filterNode(value, data) {
+            if (!value) return true;
+            return data.label.indexOf(value) !== -1;
+        },
+        handleClickSubject() {
+            this.dialogSubjectVisible = true;
+            this.dialogVisible = false;
+        },
+        handleSave() {
+            let currentNode = this.$refs.tree2.getCurrentNode();
+            console.log(currentNode);
+            let childrenNode = currentNode.children;
+            if(childrenNode != null && childrenNode.length>0){
+                this.$message({
+                    message: '请选择该叶子科目',
+                    type: 'warning',
+                    duration: 1000
+                });
+            }
+            this.invest.subjectCode = currentNode.subjectCode
+            this.invest.subjectName = currentNode.subjectName
+            this.dialogVisible = true;
+            this.dialogSubjectVisible = false;
+
+        },
+        handleClear() {
+            this.dialogVisible = true;
+            this.dialogSubjectVisible = false;
+        },
+
         handleResetSearch() {
             this.query = Object.assign({}, defaultListQuery);
         },
@@ -442,6 +516,7 @@ export default {
         this.initOrderCountDate();
         this.getAccountData();
         this.getData();
+        this.treeList();
     }
 
 };
