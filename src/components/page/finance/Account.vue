@@ -1,10 +1,11 @@
 <template>
     <div>
 
-        <el-card class="filter-container" shadow="never">
-            <div class="handle-box">
-                <span>帐套编号: </span><el-input v-model="query.accountCode" placeholder="帐套编号" class="handle-input mr10"></el-input>
 
+        <el-card class="filter-container" shadow="never">
+            <div>
+                <i class="el-icon-search"></i>
+                <span>筛选搜索</span>
                 <el-button
                         style="float:right"
                         type="primary"
@@ -20,7 +21,42 @@
                     重置
                 </el-button>
             </div>
+            <div style="margin-top: 15px">
+                <el-form :inline="true" :model="query" size="small" label-width="140px">
+<!--                    <el-form-item label="帐套编号：">-->
+<!--                        <el-input v-model="query.accountCode" class="input-width" placeholder="帐套编号"></el-input>-->
+<!--                    </el-form-item>-->
+
+                    <el-form-item label="帐套名称：">
+                        <el-select v-model="query.accountCode" placeholder="全部" clearable class="input-width">
+                            <el-option
+                                    v-for="item in accountData"
+                                    :key="item.id"
+                                    :label="item.accountName"
+                                    :value="item.accountCode">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+
+                    <el-form-item label="创建时间：" >
+                        <el-date-picker
+                                style="float: right;z-index: 1"
+                                size="small"
+                                v-model="queryDate"
+                                type="daterange"
+                                align="right"
+                                unlink-panels
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                @change="handleDateChange"
+                                :picker-options="pickerOptions">
+                        </el-date-picker>
+                    </el-form-item>
+                </el-form>
+            </div>
         </el-card>
+
         <el-card class="operate-container" shadow="never">
             <el-button
                     type="primary"
@@ -144,12 +180,14 @@
 </template>
 
 <script>
-    import { fetchAccountData } from '@/api/index';
-    import { formatDate } from '@/utils/date';
+    import { fetchAccountData,listAccountData } from '@/api/index';
+    import { formatDate ,getFirstTimestamp, getLastTimestamp} from '@/utils/date';
     import { createAccount, deleteAccount,  updateAccount} from '@/api/account';
 
     const defaultListQuery = {
     accountCode: null,
+    endTime:'',
+    startTime: '',
     page: 1,
     size: 10
 }
@@ -171,6 +209,33 @@ export default {
     name: 'basetable',
     data() {
         return {
+            accountData:[],
+            pickerOptions: {
+                shortcuts: [{
+                    text: '最近一周',
+                    onClick(picker) {
+                        const end = new Date();
+                        let start = new Date();
+                        start.setFullYear(start.getFullYear());
+                        start.setMonth(start.getMonth());
+                        start.setDate(start.getDay());
+                        end.setTime(start.getTime() + 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }, {
+                    text: '最近一月',
+                    onClick(picker) {
+                        const end = new Date();
+                        let start = new Date();
+                        start.setFullYear(start.getFullYear());
+                        start.setMonth(start.getMonth());
+                        start.setDate(start.getDay());
+                        end.setTime(start.getTime() + 3600 * 1000 * 24 * 30);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }]
+            },
+            queryDate:'',
             query: Object.assign({},defaultListQuery),
             tableData: [],
             multipleSelection: [],
@@ -195,8 +260,15 @@ export default {
         },
     },
     methods: {
+        handleDateChange(){
+            console.log(this.queryDate)
+            this.getData();
+        },
+
         handleResetSearch() {
             this.query = Object.assign({}, defaultListQuery);
+            // this.initOrderCountDate()
+            this.queryDate = []
         },
         handleUpdate(index, row) {
             this.dialogVisible = true;
@@ -213,6 +285,9 @@ export default {
         // 获取 easy-mock 的模拟数据
         getData() {
             this.listLoading=true;
+            this.query.startTime = getFirstTimestamp(this.queryDate[0]);
+            this.query.endTime = getLastTimestamp(this.queryDate[1]);
+            console.log(this.queryDate)
             fetchAccountData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
@@ -244,6 +319,13 @@ export default {
 
                 })
                 .catch(() => {});
+        },
+        initOrderCountDate(){
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            this.queryDate=[start,end];
+            console.log(this.queryDate)
         },
         // 多选操作
         handleSelectionChange(val) {
@@ -324,13 +406,23 @@ export default {
             this.query.size = val;
             this.getData();
         },
-
+        // 获取帐套列表
+        getAccountData() {
+            listAccountData().then(res=>{
+                this.accountData = res.data
+                console.log(res.data)
+                console.log(this.accountData)
+            })
+        },
 
 
 
     },
     created() {
+        this.initOrderCountDate();
         this.getData();
+        this.getAccountData();
+
     }
 
 };

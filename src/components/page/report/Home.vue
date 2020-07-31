@@ -95,7 +95,7 @@
 </template>
 
 <script>
-  import {str2Date,getFirstTimestamp, getLastTimestamp} from '@/utils/date';
+  import {getFirstTimestamp, getLastTimestamp} from '@/utils/date';
   import img_home_order from '@/assets/img/home_order.png';
   import img_home_today_amount from '@/assets/img/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';

@@ -47,7 +47,7 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column  label="ID" prop="id" width="55" align="center"></el-table-column>
-                <el-table-column  label="帐套编号"  prop="accountCode" align="center">
+                <el-table-column  label="帐套编号"  prop="accountName" align="center">
 
                 </el-table-column>
                 <el-table-column  label="投资人名称" prop="investName"  align="center"></el-table-column>
