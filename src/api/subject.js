@@ -26,3 +26,12 @@ export function deleteSubject(params) {
     params: params
   })
 }
+
+
+export function fetchTreeList() {
+  return request({
+    url: '/finance/subject/treeList',
+    method: 'get'
+  })
+}
+

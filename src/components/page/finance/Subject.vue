@@ -2,9 +2,7 @@
     <div>
 
         <el-card class="filter-container" shadow="never">
-            <div class="handle-box">
-                <span>科目编号: </span><el-input v-model="query.subjectCode" placeholder="科目编号" class="handle-input mr10"></el-input>
-
+            <div>
                 <el-button
                         style="float:right"
                         type="primary"
@@ -19,6 +17,13 @@
                         size="small">
                     重置
                 </el-button>
+            </div>
+            <div style="margin-top: 15px">
+                <el-form :inline="true" :model="query" size="small" label-width="140px">
+                                        <el-form-item label="科目编号：">
+                                            <el-input v-model="query.subjectCode" class="input-width" placeholder="科目编号"></el-input>
+                                        </el-form-item>
+                </el-form>
             </div>
         </el-card>
         <el-card class="operate-container" shadow="never">
@@ -49,7 +54,7 @@
                 <el-table-column  label="ID" prop="id" width="55" align="center"></el-table-column>
                 <el-table-column  label="科目编号" prop="subjectCode"  align="center"></el-table-column>
                 <el-table-column  label="科目名称" prop="subjectName"  align="center"></el-table-column>
-                <el-table-column label="父科目编号" prop="parentCode" align="center"></el-table-column>
+                <el-table-column label="父科目名称" prop="parentName" align="center"></el-table-column>
                 <el-table-column label="科目类型" align="center">
                     <template slot-scope="scope">
                         {{scope.row.subjectType | formatType}}
@@ -104,6 +109,32 @@
         </div>
 
         <el-dialog
+                :title="'选择科目'"
+                :visible.sync="dialogSubjectVisible"
+                width="40%">
+
+
+            <el-card class="form-container" shadow="never">
+                <el-tree
+                        :data="menuTreeList"
+                        default-expand-all
+                        :filter-node-method="filterNode"
+                        class="filter-tree"
+                        highlight-current
+                        ref="tree2"
+                        :props="defaultProps">
+                </el-tree>
+                <div style="margin-top: 20px" align="center">
+                    <el-button type="primary" @click="handleSave()">确定</el-button>
+                    <el-button @click="handleClear()">取消</el-button>
+                </div>
+
+            </el-card>
+
+        </el-dialog>
+
+
+        <el-dialog
                 :title="isEdit?'编辑科目':'添加科目'"
                 :visible.sync="dialogVisible"
                 width="40%">
@@ -114,10 +145,14 @@
                         <el-input v-model="subject.subjectCode" style="width: 250px"></el-input>
                     </el-form-item>
                     <el-form-item label="科目名称：">
-                        <el-input v-model="subject.subjectName" style="width: 250px"></el-input>
+                        <el-input v-model="subject.subjectName" style="width: 250px">
+
+                        </el-input>
                     </el-form-item>
                     <el-form-item label="父科目编号：">
-                        <el-input v-model="subject.parentCode" style="width: 250px"></el-input>
+                        <el-input v-model="subject.parentName" style="width: 250px">
+                            <el-button slot="append" icon="el-icon-search" @click="handleClickSubject()"></el-button>
+                        </el-input>
                     </el-form-item>
 
                 <el-form-item label="科目类型：">
@@ -158,7 +193,7 @@
 <script>
     import { fetchSubjectData } from '@/api/index';
     import { formatDate } from '@/utils/date';
-    import { createSubject, deleteSubject,  updateSubject} from '@/api/subject';
+    import { createSubject, deleteSubject,  updateSubject,fetchTreeList} from '@/api/subject';
 
     const defaultListQuery = {
     subjectCode: null,
@@ -172,6 +207,7 @@ const defaultSubject = {
     subjectName: null,
     parentCode: null,
     subjectType: null,
+    parentName: null,
     borrowFlag: null,
     remark: null
 };
@@ -180,10 +216,17 @@ export default {
     name: 'basetable',
     data() {
         return {
+            menuTreeList: [],
+            defaultProps: {
+                children: 'children',
+                label: 'subjectName'
+            },
+            parentSubjectCode: null,
             query: Object.assign({},defaultListQuery),
             tableData: [],
             multipleSelection: [],
             dialogVisible: false,
+            dialogSubjectVisible: false,
             listLoading:false,
             isEdit: false,
             total: 0,
@@ -227,7 +270,54 @@ export default {
             }
         },
     },
+
+    watch: {
+        filterText(val) {
+            this.$refs.tree2.filter(val);
+            console.log(val)
+            console.log(this.$refs.tree2.filter(val))
+        }
+    },
+
     methods: {
+
+
+        filterNode(value, data) {
+            if (!value) return true;
+            return data.label.indexOf(value) !== -1;
+        },
+        handleClickSubject() {
+            this.dialogSubjectVisible = true;
+            this.dialogVisible = false;
+        },
+        handleSave() {
+            let currentNode = this.$refs.tree2.getCurrentNode();
+            console.log(currentNode);
+           let childrenNode = currentNode.children;
+           if(childrenNode != null && childrenNode.length>0){
+               this.$message({
+                   message: '请选择该叶子科目',
+                   type: 'warning',
+                   duration: 1000
+               });
+           }
+            this.subject.parentCode = currentNode.subjectCode
+            this.subject.parentName = currentNode.subjectName
+            this.dialogVisible = true;
+            this.dialogSubjectVisible = false;
+
+        },
+        handleClear() {
+            this.dialogVisible = true;
+            this.dialogSubjectVisible = false;
+        },
+        //查询科目树
+        treeList() {
+            fetchTreeList().then(response => {
+                this.menuTreeList = response.data;
+            });
+        },
+
         handleResetSearch() {
             this.query = Object.assign({}, defaultListQuery);
         },
@@ -363,6 +453,7 @@ export default {
     },
     created() {
         this.getData();
+        this.treeList();
     }
 
 };

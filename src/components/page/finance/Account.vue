@@ -4,8 +4,6 @@
 
         <el-card class="filter-container" shadow="never">
             <div>
-                <i class="el-icon-search"></i>
-                <span>筛选搜索</span>
                 <el-button
                         style="float:right"
                         type="primary"
@@ -261,7 +259,6 @@ export default {
     },
     methods: {
         handleDateChange(){
-            console.log(this.queryDate)
             this.getData();
         },
 
@@ -287,7 +284,6 @@ export default {
             this.listLoading=true;
             this.query.startTime = getFirstTimestamp(this.queryDate[0]);
             this.query.endTime = getLastTimestamp(this.queryDate[1]);
-            console.log(this.queryDate)
             fetchAccountData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
@@ -410,8 +406,6 @@ export default {
         getAccountData() {
             listAccountData().then(res=>{
                 this.accountData = res.data
-                console.log(res.data)
-                console.log(this.accountData)
             })
         },
 

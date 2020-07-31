@@ -2,9 +2,7 @@
     <div>
 
         <el-card class="filter-container" shadow="never">
-            <div class="handle-box">
-                <span>帐套编号: </span><el-input v-model="query.accountCode" placeholder="帐套编号" class="handle-input mr10"></el-input>
-
+            <div>
                 <el-button
                         style="float:right"
                         type="primary"
@@ -20,7 +18,42 @@
                     重置
                 </el-button>
             </div>
+            <div style="margin-top: 15px">
+                <el-form :inline="true" :model="query" size="small" label-width="140px">
+                    <!--                    <el-form-item label="帐套名称：">-->
+                    <!--                        <el-input v-model="query.accountCode" class="input-width" placeholder="帐套名称"></el-input>-->
+                    <!--                    </el-form-item>-->
+
+                    <el-form-item label="帐套名称：">
+                        <el-select v-model="query.accountCode" placeholder="全部" clearable class="input-width">
+                            <el-option
+                                    v-for="item in accountData"
+                                    :key="item.id"
+                                    :label="item.accountName"
+                                    :value="item.accountCode">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+
+                    <el-form-item label="创建时间：" >
+                        <el-date-picker
+                                style="float: right;z-index: 1"
+                                size="small"
+                                v-model="queryDate"
+                                type="daterange"
+                                align="right"
+                                unlink-panels
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                @change="handleDateChange"
+                                :picker-options="pickerOptions">
+                        </el-date-picker>
+                    </el-form-item>
+                </el-form>
+            </div>
         </el-card>
+
         <el-card class="operate-container" shadow="never">
             <el-button
                     type="primary"
@@ -47,9 +80,8 @@
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column  label="ID" prop="id" width="55" align="center"></el-table-column>
-                <el-table-column  label="帐套编号"  prop="accountName" align="center">
-
-                </el-table-column>
+                <el-table-column  label="帐套名称"  prop="accountName" align="center"></el-table-column>
+                <el-table-column  label="科目编号"  prop="subjectCode" align="center"></el-table-column>
                 <el-table-column  label="投资人名称" prop="investName"  align="center"></el-table-column>
                 <el-table-column label="投资款" prop="investFund" align="center"></el-table-column>
                 <el-table-column label="投资总额" prop="investAmount" align="center"></el-table-column>
@@ -116,6 +148,9 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                    <el-form-item label="科目编号：">
+                        <el-input v-model="invest.subjectCode" style="width: 250px"></el-input>
+                    </el-form-item>
                     <el-form-item label="投资人名称：">
                         <el-input v-model="invest.investName" style="width: 250px"></el-input>
                     </el-form-item>
@@ -151,11 +186,13 @@
 
 <script>
     import { fetchInvestData,listAccountData } from '@/api/index';
-    import { formatDate } from '@/utils/date';
+    import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import { createInvest, deleteInvest,  updateInvest} from '@/api/invest';
 
     const defaultListQuery = {
     accountCode: null,
+    endTime:'',
+    startTime: '',
     page: 1,
     size: 10
 }
@@ -163,6 +200,7 @@
 const defaultInvest = {
     id: null,
     accountCode: null,
+    subjectCode: null,
     investName: null,
     investFund: null,
     investAmount: null,
@@ -175,6 +213,32 @@ export default {
     data() {
         return {
             accountData:[],
+            pickerOptions: {
+                shortcuts: [{
+                    text: '最近一周',
+                    onClick(picker) {
+                        const end = new Date();
+                        let start = new Date();
+                        start.setFullYear(start.getFullYear());
+                        start.setMonth(start.getMonth());
+                        start.setDate(start.getDay());
+                        end.setTime(start.getTime() + 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }, {
+                    text: '最近一月',
+                    onClick(picker) {
+                        const end = new Date();
+                        let start = new Date();
+                        start.setFullYear(start.getFullYear());
+                        start.setMonth(start.getMonth());
+                        start.setDate(start.getDay());
+                        end.setTime(start.getTime() + 3600 * 1000 * 24 * 30);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }]
+            },
+            queryDate:'',
             query: Object.assign({},defaultListQuery),
             tableData: [],
             multipleSelection: [],
@@ -223,6 +287,9 @@ export default {
         },
     },
     methods: {
+        handleDateChange(){
+            this.getData();
+        },
         handleResetSearch() {
             this.query = Object.assign({}, defaultListQuery);
         },
@@ -241,6 +308,8 @@ export default {
         // 获取 easy-mock 的模拟数据
         getData() {
             this.listLoading=true;
+            this.query.startTime = getFirstTimestamp(this.queryDate[0]);
+            this.query.endTime = getLastTimestamp(this.queryDate[1]);
             fetchInvestData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
@@ -269,9 +338,15 @@ export default {
                         this.tableData.splice(index, 1);
                     })
 
-
                 })
                 .catch(() => {});
+        },
+        initOrderCountDate(){
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            this.queryDate=[start,end];
+            console.log(this.queryDate)
         },
         // 多选操作
         handleSelectionChange(val) {
@@ -357,8 +432,6 @@ export default {
         getAccountData() {
             listAccountData().then(res=>{
                 this.accountData = res.data
-                console.log(res.data)
-                console.log(this.accountData)
             })
         },
 
@@ -366,6 +439,7 @@ export default {
 
     },
     created() {
+        this.initOrderCountDate();
         this.getAccountData();
         this.getData();
     }
