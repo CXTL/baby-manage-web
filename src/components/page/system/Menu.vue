@@ -1,10 +1,9 @@
 <template>
     <div>
 
-        <el-card class="filter-container" shadow="never">
-            <div class="handle-box">
-                <span>菜单名称: </span><el-input v-model="query.name" placeholder="菜单名称" class="handle-input mr10"></el-input>
 
+        <el-card class="filter-container" shadow="never">
+            <div>
                 <el-button
                         style="float:right"
                         type="primary"
@@ -20,7 +19,32 @@
                     重置
                 </el-button>
             </div>
+            <div style="margin-top: 15px">
+                <el-form :inline="true" :model="query" size="small" label-width="140px">
+                    <el-form-item label="菜单名称：">
+                        <el-input v-model="query.name" class="input-width" placeholder="菜单名称"></el-input>
+                    </el-form-item>
+
+
+                    <el-form-item label="创建时间：" >
+                        <el-date-picker
+                                style="float: right;z-index: 1"
+                                size="small"
+                                v-model="queryDate"
+                                type="daterange"
+                                align="right"
+                                unlink-panels
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                @change="handleDateChange"
+                                :picker-options="pickerOptions">
+                        </el-date-picker>
+                    </el-form-item>
+                </el-form>
+            </div>
         </el-card>
+
         <el-card class="operate-container" shadow="never">
             <el-button
                     type="primary"
@@ -160,11 +184,13 @@
 
 <script>
     import { fetchMenuData } from '@/api/index';
-    import {formatDate} from '@/utils/date';
+    import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import {createMenu,updateMenu,deleteMenu} from '@/api/menu';
 
 const defaultListQuery = {
     name: null,
+    endTime:'',
+    startTime: '',
     page: 1,
     size: 10
 }
@@ -186,6 +212,32 @@ export default {
     name: 'basetable',
     data() {
         return {
+            pickerOptions: {
+                shortcuts: [{
+                    text: '最近一周',
+                    onClick(picker) {
+                        const end = new Date();
+                        let start = new Date();
+                        start.setFullYear(start.getFullYear());
+                        start.setMonth(start.getMonth());
+                        start.setDate(start.getDay());
+                        end.setTime(start.getTime() + 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }, {
+                    text: '最近一月',
+                    onClick(picker) {
+                        const end = new Date();
+                        let start = new Date();
+                        start.setFullYear(start.getFullYear());
+                        start.setMonth(start.getMonth());
+                        start.setDate(start.getDay());
+                        end.setTime(start.getTime() + 3600 * 1000 * 24 * 30);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }]
+            },
+            queryDate:'',
             query: Object.assign({},defaultListQuery),
             tableData: [],
             multipleSelection: [],
@@ -200,9 +252,7 @@ export default {
             id: -1
         };
     },
-    created() {
-        this.getData();
-    },
+
     filters: {
         formatTime(time) {
             if (time == null || time === '') {
@@ -227,6 +277,16 @@ export default {
         },
     },
     methods: {
+        handleDateChange(){
+            this.getData();
+        },
+        initOrderCountDate(){
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            this.queryDate=[start,end];
+            console.log(this.queryDate)
+        },
         handleResetSearch() {
             this.query = Object.assign({}, defaultListQuery);
         },
@@ -245,6 +305,8 @@ export default {
         // 获取 easy-mock 的模拟数据
         getData() {
             this.listLoading=true;
+            this.query.startTime = getFirstTimestamp(this.queryDate[0]);
+            this.query.endTime = getLastTimestamp(this.queryDate[1]);
             fetchMenuData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
@@ -356,7 +418,11 @@ export default {
         }
 
 
-    }
+    },
+    created() {
+        this.initOrderCountDate();
+        this.getData();
+    },
 };
 </script>
 

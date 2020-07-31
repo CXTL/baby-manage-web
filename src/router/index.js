@@ -16,7 +16,7 @@ export default new Router({
             children: [
                 {
                     path: '/dashboard',
-                    component: () => import(/* webpackChunkName: "dashboard" */ '@/components/page/Dashboard'),
+                    component: () => import(/* webpackChunkName: "dashboard" */ '@/components/page/report/Home'),
                     meta: { title: '系统首页' }
                 },
                 {

@@ -67,17 +67,17 @@
         <el-col>
           <div style="padding: 10px;border-left:1px solid #DCDFE6">
             <el-date-picker
-              style="float: right;z-index: 1"
-              size="small"
-              v-model="orderCountDate"
-              type="daterange"
-              align="right"
-              unlink-panels
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              @change="handleDateChange"
-              :picker-options="pickerOptions">
+                    style="float: left;z-index: 1"
+                    size="small"
+                    v-model="queryDate"
+                    type="daterange"
+                    align="right"
+                    unlink-panels
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    @change="handleDateChange"
+                    :picker-options="pickerOptions">
             </el-date-picker>
             <div>
               <ve-line
@@ -159,7 +159,7 @@
             }
           }]
         },
-        orderCountDate: '',
+        queryDate: '',
         chartSettings: {
           xAxisType: 'time',
           area:false,
@@ -177,8 +177,8 @@
       }
     },
     created(){
-      this.getHomeReportData();
       this.initOrderCountDate();
+      this.getHomeReportData();
       this.getData();
     },
     methods:{
@@ -186,13 +186,11 @@
         this.getData();
       },
       initOrderCountDate(){
-        let start = new Date();
-        start.setFullYear(start.getFullYear());
-        start.setMonth(start.getMonth());
-        start.setDate(start.getDay());
         const end = new Date();
-        end.setTime(start.getTime() + 1000 * 60 * 60 * 24 * 7);
-        this.orderCountDate=[start,end];
+        const start = new Date();
+        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+        this.queryDate=[start,end];
+        console.log(this.queryDate)
       },
 
       //获取表头数据
@@ -204,8 +202,8 @@
 
       getData(){
         setTimeout(() => {
-          this.query.startTime = getFirstTimestamp(this.orderCountDate[0]);
-          this.query.endTime = getLastTimestamp(this.orderCountDate[1]);
+          this.query.startTime = getFirstTimestamp(this.queryDate[0]);
+          this.query.endTime = getLastTimestamp(this.queryDate[1]);
           fetchHomeChartReportData(this.query).then(res => {
             this.chartData = {
               columns: ['date', 'totalIncome','totalExpenditure','totalAsset','totalProfit'],
