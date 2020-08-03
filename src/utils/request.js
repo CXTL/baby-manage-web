@@ -8,7 +8,7 @@ const service = axios.create({
     // easy-mock服务挂了，暂时不使用了
     // baseURL: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
     // baseURL: "http://localhost:7506", // api的base_url
-    baseURL: "http://dupake.cn", // api的base_url
+    baseURL: "http://www.dupake.cn", // api的base_url
     timeout: 5000 // 请求超时时间
 });
 
@@ -32,6 +32,7 @@ service.interceptors.response.use(
          * code为非200是抛错 可结合自己业务进行修改
          */
         const res = response.data
+        console.log(res)
         if (res.code !== 200) {
             Message({
                 message: res.message,

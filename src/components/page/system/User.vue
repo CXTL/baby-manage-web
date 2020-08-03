@@ -142,46 +142,46 @@
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="admin"
-                     ref="adminForm"
+                     :rules="rules"
+                     ref="admin"
                      label-width="150px" size="small">
-                    <el-form-item label="帐号：">
+                    <el-form-item label="帐号：" prop="username">
                         <el-input v-model="admin.username" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="昵称：">
+                    <el-form-item label="昵称：" prop="nickName">
                         <el-input v-model="admin.nickName" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="邮箱：">
+                    <el-form-item label="邮箱：" prop="email">
                         <el-input v-model="admin.email" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="密码：">
+                    <el-form-item label="密码：" prop="password">
                         <el-input v-model="admin.password"  type="password"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="手机号：">
+                    <el-form-item label="手机号：" prop="phone">
                         <el-input v-model="admin.phone"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="备注：">
-                        <el-input v-model="admin.note"
-                                  type="textarea"
-                                  :rows="5"
-                                  style="width: 250px"></el-input>
-                    </el-form-item>
-                    <el-form-item label="性别：">
+                    <el-form-item label="性别：" prop="sex">
                         <el-radio-group v-model="admin.sex">
                             <el-radio :label=1>男</el-radio>
                             <el-radio :label=0>女</el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="是否激活：">
+                    <el-form-item label="是否激活：" prop="status">
                         <el-radio-group v-model="admin.status">
                             <el-radio :label="1">是</el-radio>
                             <el-radio :label="0">否</el-radio>
                         </el-radio-group>
                     </el-form-item>
-
+                <el-form-item label="备注：">
+                    <el-input v-model="admin.remark"
+                              type="textarea"
+                              :rows="5"
+                              style="width: 250px"></el-input>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm('admin')" size="small">确 定</el-button>
       </span>
         </el-dialog>
         <el-dialog
@@ -207,6 +207,7 @@
 <script>
     import { fetchUserData } from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
+    import {isvalidPass,isvalidPhone,isvalidEmail} from '@/utils/validate';
     import { fetchAllRoleList } from '@/api/role';
     import { createUser, deleteUser, getRoleByAdmin, updateUser ,allocRole} from '@/api/user';
 
@@ -224,14 +225,36 @@ const defaultAdmin = {
     password: null,
     nickName: null,
     email: null,
-    note: null,
-    status: 1,
+    remark: null,
+    status: null,
+    phone: null,
     sex: null
 };
 
 export default {
     name: 'basetable',
     data() {
+        const validatePass = (rule, value, callback) => {
+            if (!isvalidPass(value)) {
+                callback(new Error('请输入6~18位字符和数字密码!'))
+            } else {
+                callback()
+            }
+        };
+        const validatePhone= (rule, value, callback) => {
+            if (!isvalidPhone(value)) {
+                callback(new Error('请输入正确的手机号!'))
+            } else {
+                callback()
+            }
+        };
+        const validateEmail= (rule, value, callback) => {
+            if (!isvalidEmail(value)) {
+                callback(new Error('请输入正确的邮箱!'))
+            } else {
+                callback()
+            }
+        };
         return {
             pickerOptions: {
                 shortcuts: [{
@@ -273,7 +296,32 @@ export default {
             allocAdminId:null,
             admin: Object.assign({}, defaultAdmin),
             idx: -1,
-            id: -1
+            id: -1,
+            rules: {
+
+                username: [
+                    { required: true, message: '请输入帐号名称', trigger: 'blur' },
+                    { min: 4, max: 18, message: '请输入4~18位字符用户名!', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, trigger: 'blur', validator: validatePass }
+                ],
+                nickName: [
+                    { required: true, message: '请输入昵称', trigger: 'blur' }
+                ],
+                email: [
+                    { required: true, trigger: 'blur', validator: validateEmail }
+                ],
+                phone: [
+                    { required: true, trigger: 'blur' , validator: validatePhone }
+                ],
+                sex: [
+                    {  required: true, message: '请选择性别', trigger: 'change' }
+                ],
+                status: [
+                    {  required: true, message: '请选择是否激活', trigger: 'change' }
+                ]
+            }
         };
     },
 
@@ -426,32 +474,43 @@ export default {
             })
         },
         //页面编辑
-        handleDialogConfirm() {
-            this.$confirm('是否要确认?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                if (this.isEdit) {
-                    updateUser(this.admin).then(response => {
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
-                } else {
-                    createUser(this.admin).then(response => {
-                        this.$message({
-                            message: '添加成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
-                }
-            })
+        handleDialogConfirm(admin) {
+
+            this.$refs[admin].validate((valid) => {
+                if (valid) {
+                        this.$confirm('是否要确认?', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            if (this.isEdit) {
+                                updateUser(this.admin).then(response => {
+                                    this.$message({
+                                        message: '修改成功！',
+                                        type: 'success'
+                                    });
+                                    this.dialogVisible =false;
+                                    this.getData();
+                                })
+                            } else {
+                                createUser(this.admin).then(response => {
+                                    this.$message({
+                                        message: '添加成功！',
+                                        type: 'success'
+                                    });
+                                    this.dialogVisible =false;
+                                    this.getData();
+                                })
+                            }
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+
+
+
         },
 
         // 分页导航
