@@ -13,7 +13,7 @@ export function isvalidPass(str) {
 
 //   验证用户名  用户名要求 6~18
 export function isvalidUsername(str) {
-  return str.trim().length>=6 && str.trim().length<=18
+  return str.trim().length>=5 && str.trim().length<=18
 }
 
 // 手机号验证

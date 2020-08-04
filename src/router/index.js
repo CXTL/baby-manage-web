@@ -57,17 +57,17 @@ export default new Router({
                 },
                 {
                     path: '/loginLog',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/system/User'),
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/404'),
                     meta: { title: '登陆日志' }
                 },
                 {
                     path: '/dict',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/system/User'),
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/404'),
                     meta: { title: '字典管理' }
                 },
                 {
                     path: '/businessLog',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/system/User'),
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/404'),
                     meta: { title: '业务日志' }
                 }
 
@@ -96,7 +96,7 @@ export default new Router({
                 },
                 {
                     path: '/assetReport',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/report/Home'),
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/report/AccountReport'),
                     meta: { title: '资产报表' }
                 },
                 {

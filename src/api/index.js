@@ -66,6 +66,15 @@ export const fetchAssetData = query => {
     });
 };
 
+//获取资产报表详情信息
+export const fetchAssetReportData = query => {
+    return request({
+        url: '/report/asset/listAssetInfoByPage',
+        method: 'post',
+        data: query
+    });
+};
+
 
 //获取全部帐套信息
 export const listAccountData = () => {
@@ -74,3 +83,4 @@ export const listAccountData = () => {
         method: 'get'
     });
 };
+

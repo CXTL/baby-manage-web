@@ -1,41 +1,5 @@
 <template>
   <div class="app-container">
-    <div class="total-layout">
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <div class="total-frame">
-            <img :src="img_home_order" class="total-icon">
-            <div class="total-title">今日收入: ￥{{homeReportData.incomeToday}}</div>
-            <div class="total-title">昨日收入: ￥{{homeReportData.incomeYesterday}}</div>
-            <div class="total-title">同比昨日:  {{homeReportData.rateIncome}}%</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="total-frame">
-            <img :src="img_home_today_amount" class="total-icon">
-            <div class="total-title">今日支出: ￥{{homeReportData.expenditureToday}}</div>
-            <div class="total-title">昨日支出: ￥{{homeReportData.expenditureYesterday}}</div>
-            <div class="total-title">同比昨日: {{homeReportData.rateExpenditure}}%</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="total-frame">
-            <img :src="img_home_yesterday_amount" class="total-icon">
-            <div class="total-title">今日利润: ￥{{homeReportData.profitToday}}</div>
-            <div class="total-title">昨日利润: ￥{{homeReportData.profitYesterday}}</div>
-            <div class="total-title">同比昨日: {{homeReportData.rateProfit}}%</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="total-frame">
-            <img :src="img_home_order" class="total-icon">
-            <div class="total-title">今日资产: ￥{{homeReportData.assetToday}}</div>
-            <div class="total-title">昨日资产: ￥{{homeReportData.assetYesterday}}</div>
-            <div class="total-title">同比昨日: +{{homeReportData.rateAsset}}%</div>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
     <div class="statistics-layout">
       <div class="layout-title">资产统计</div>
       <el-row>
@@ -56,7 +20,6 @@
             </el-date-picker>
             <div>
               <ve-line
-                      height="700px"
                 :data="chartData"
                 :legend-visible="false"
                 :loading="loading"
@@ -67,6 +30,37 @@
         </el-col>
       </el-row>
     </div>
+    <div class="statistics-layout">
+      <div class="layout-title">资产详情</div>
+      <el-table
+              :data="tableData"
+              border
+              class="table"
+              header-cell-class-name="table-header"
+      >
+
+        <el-table-column prop="startTime" label="开始时间" align="center"></el-table-column>
+        <el-table-column prop="endTime" label="结束时间" align="center"></el-table-column>
+        <el-table-column prop="totalIncome" label="总收入"  align="center"></el-table-column>
+        <el-table-column prop="totalExpenditure"  label="总支出" align="center"></el-table-column>
+        <el-table-column prop="totalProfit" label="总利润" align="center"></el-table-column>
+        <el-table-column prop="totalAsset"  label="总资产" align="center"></el-table-column>
+      </el-table>
+
+
+      <div class="pagination">
+        <el-pagination
+                background
+                @size-change="handleSizeChange"
+                @current-change="handlePageChange"
+                layout="total, sizes,prev, pager, next,jumper"
+                :current-page="query.page"
+                :page-size="query.size"
+                :page-sizes="[5,10,15]"
+                :total="total">
+        </el-pagination>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -76,11 +70,14 @@
   import img_home_today_amount from '@/assets/img/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
   import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/home';
+  import { fetchAssetReportData } from '@/api/index';
 
  const defaultListQuery ={
     accountCode: null,
     endTime:'',
-    startTime: ''
+    startTime: '',
+         page: 1,
+         size: 10
   };
 
   const homeReportData ={
@@ -135,6 +132,7 @@
             }
           }]
         },
+        total: 0,
         queryDate: '',
         chartSettings: {
           xAxisType: 'time',
@@ -146,20 +144,17 @@
           rows: []
         },
         loading: false,
+        tableData:[],
         dataEmpty: false,
         img_home_order,
         img_home_today_amount,
         img_home_yesterday_amount
       }
     },
-    created(){
-      this.initOrderCountDate();
-      this.getHomeReportData();
-      this.getData();
-    },
+
     methods:{
       handleDateChange(){
-        this.getData();
+        this.getAssetChartData();
       },
       initOrderCountDate(){
         const end = new Date();
@@ -169,14 +164,30 @@
         console.log(this.queryDate)
       },
 
-      //获取表头数据
+      //获取列表详情数据
       getHomeReportData(){
-        fetchHomeReportData(this.query).then(res => {
-          this.homeReportData = res.data;
+        this.listLoading=true;
+        this.query.startTime = getFirstTimestamp(this.queryDate[0]);
+        this.query.endTime = getLastTimestamp(this.queryDate[1]);
+        fetchAssetReportData(this.query).then(res => {
+          this.listLoading=false;
+          this.tableData = res.data;
+          this.total = res.data.total || 50;
         });
       },
-
-      getData(){
+      // 分页导航
+      handlePageChange(val) {
+        this.query.page = val;
+        this.getData();
+      },
+      // 分页导航
+      handleSizeChange(val) {
+        this.query.page = 1;
+        this.query.size = val;
+        this.getData();
+      },
+      //获取报表数据
+      getAssetChartData(){
         setTimeout(() => {
           this.query.startTime = getFirstTimestamp(this.queryDate[0]);
           this.query.endTime = getLastTimestamp(this.queryDate[1]);
@@ -192,13 +203,18 @@
           this.loading = false
         }, 500)
       }
-    }
+    },
+    created(){
+      this.initOrderCountDate();
+      this.getHomeReportData();
+      this.getAssetChartData();
+    },
   }
 </script>
 
 <style scoped>
   .app-container {
-    margin-top: 40px;
+    margin-top: 20px;
     margin-left: 120px;
     margin-right: 120px;
   }

@@ -342,13 +342,13 @@ export default {
             let currentNode = this.$refs.tree2.getCurrentNode();
             console.log(currentNode);
             let childrenNode = currentNode.children;
-            if(childrenNode != null && childrenNode.length>0){
-                this.$message({
-                    message: '请选择该叶子科目',
-                    type: 'warning',
-                    duration: 1000
-                });
-            }
+            // if(childrenNode != null && childrenNode.length>0){
+            //     this.$message({
+            //         message: '请选择该叶子科目',
+            //         type: 'warning',
+            //         duration: 1000
+            //     });
+            // }
             this.asset.subjectCode = currentNode.subjectCode
             this.asset.subjectName = currentNode.subjectName
             this.dialogVisible = true;
