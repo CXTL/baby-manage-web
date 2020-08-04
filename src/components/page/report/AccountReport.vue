@@ -1,6 +1,13 @@
 <template>
+
   <div class="app-container">
     <div class="statistics-layout">
+      <el-button
+              type="primary"
+              icon="el-icon-circle-plus-outline"
+              class="handle-del mr10"
+              @click="exportExcel"
+      >导出</el-button>
       <div class="layout-title">资产统计</div>
       <el-row>
         <el-col>
@@ -71,6 +78,7 @@
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
   import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/home';
   import { fetchAssetReportData } from '@/api/index';
+  import { exportExcel } from '@/api/base';
 
  const defaultListQuery ={
     accountCode: null,
@@ -155,6 +163,22 @@
     methods:{
       handleDateChange(){
         this.getAssetChartData();
+      },
+      exportExcel(){
+        exportExcel().then(res => {
+          console.log(res)
+          const link = document.createElement("a");
+          let blob = new Blob([res.data], {
+            type: "application/vnd.ms-excel"
+          });
+          link.style.display = "none";
+          link.href = URL.createObjectURL(blob);
+          link.setAttribute("download", "统计.xls");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+        });
       },
       initOrderCountDate(){
         const end = new Date();

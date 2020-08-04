@@ -132,33 +132,34 @@
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="menu"
-                     ref="menuForm"
+                     ref="menu"
+                     :rules="rules"
                      label-width="150px" size="small">
-                    <el-form-item label="名称：">
+                    <el-form-item label="名称：" prop="name">
                         <el-input v-model="menu.name" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="父菜单名称：">
+                    <el-form-item label="父菜单名称：" prop="pid">
                         <el-input v-model="menu.pid" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="路径：">
+                    <el-form-item label="路径：" prop="path">
                         <el-input v-model="menu.path" style="width: 250px"></el-input>
                     </el-form-item>
                     <el-form-item label="图标：">
                         <el-input v-model="menu.icon"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="排序：">
+                    <el-form-item label="排序：" prop="sort">
                         <el-input v-model="menu.sort"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="权限：">
+                    <el-form-item label="权限：" prop="permission">
                         <el-input v-model="menu.permission"  style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="类型：">
+                    <el-form-item label="类型：" prop="type">
                         <el-radio-group v-model="menu.type">
                             <el-radio :label="1">资源权限</el-radio>
                             <el-radio :label="0">菜单权限</el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="是否隐藏：">
+                    <el-form-item label="是否隐藏：" prop="hidden">
                         <el-radio-group v-model="menu.hidden">
                             <el-radio :label="1">是</el-radio>
                             <el-radio :label="0">否</el-radio>
@@ -249,7 +250,16 @@ export default {
             form: {},
             menu: Object.assign({}, defaultMenu),
             idx: -1,
-            id: -1
+            id: -1,
+            rules: {
+
+                name: [
+                    { required: true, message: '请输入角色名称', trigger: 'blur' },
+                ],
+                isEnable: [
+                    {  required: true, message: '请选择是否启用', trigger: 'change' }
+                ]
+            }
         };
     },
 
