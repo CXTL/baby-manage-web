@@ -25,7 +25,15 @@ export function fetchAllRoleList() {
   })
 }
 
-export function getRoleByAdmin(params) {
+export function listAccountByUserId(params) {
+  return request({
+    url: '/system/account/getAccountByAdmin',
+    method: 'get',
+    params: params
+  })
+}
+
+export function listRoleByUserId(params) {
   return request({
     url: '/system/roles/listRoleByUserId',
     method: 'get',
@@ -40,9 +48,20 @@ export function deleteUser(params) {
     params: params
   })
 }
+
+
 export function allocRole(data) {
   return request({
     url: '/system/users/allocRole',
+    method: 'post',
+    data: data
+  })
+}
+
+
+export function allocAccount(data) {
+  return request({
+    url: '/system/users/allocAccount',
     method: 'post',
     data: data
   })

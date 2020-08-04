@@ -103,9 +103,14 @@
                     <template slot-scope="scope">
                         <el-button size="mini"
                                    type="text"
+                                   icon="el-icon-edit"
                                    @click="handleSelectRole(scope.$index, scope.row)">分配角色
                         </el-button>
-
+                        <el-button size="mini"
+                                   type="text"
+                                   icon="el-icon-edit"
+                                   @click="handleSelectAccount(scope.$index, scope.row)">分配帐套
+                        </el-button>
                         <el-button size="mini"
                                    type="text"
                                    icon="el-icon-edit"
@@ -184,6 +189,7 @@
         <el-button type="primary" @click="handleDialogConfirm('admin')" size="small">确 定</el-button>
       </span>
         </el-dialog>
+
         <el-dialog
                 title="分配角色"
                 :visible.sync="allocDialogVisible"
@@ -201,15 +207,38 @@
         <el-button type="primary" @click="handleAllocDialogConfirm()" size="small">确 定</el-button>
       </span>
         </el-dialog>
+
+
+
+        <el-dialog
+                title="分配帐套"
+                :visible.sync="allocAccountDialogVisible"
+                width="30%">
+            <el-select v-model="accountCodes" multiple placeholder="请选择" size="small" style="width: 80%">
+                <el-option
+                        v-for="item in allAccountList"
+                        :key="item.accountCode"
+                        :label="item.accountName"
+                        :value="item.accountCode">
+                </el-option>
+            </el-select>
+            <span slot="footer" class="dialog-footer">
+        <el-button @click="allocAccountDialogVisible = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="handleAllocAccountDialogConfirm()" size="small">确 定</el-button>
+      </span>
+        </el-dialog>
+
+
+
     </div>
 </template>
 
 <script>
-    import { fetchUserData } from '@/api/index';
+    import { fetchUserData ,listAccountData} from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import {isvalidPass,isvalidPhone,isvalidEmail} from '@/utils/validate';
     import { fetchAllRoleList } from '@/api/role';
-    import { createUser, deleteUser, getRoleByAdmin, updateUser ,allocRole} from '@/api/user';
+    import { createUser, deleteUser, listRoleByUserId, updateUser ,allocRole ,allocAccount,listAccountByUserId} from '@/api/user';
 
     const defaultListQuery = {
     username: null,
@@ -291,8 +320,11 @@ export default {
             total: 0,
             form: {},
             allRoleList:[],
+            allAccountList:[],
             allocDialogVisible: false,
+            allocAccountDialogVisible: false,
             allocRoleIds:[],
+            accountCodes:[],
             allocAdminId:null,
             admin: Object.assign({}, defaultAdmin),
             idx: -1,
@@ -384,12 +416,17 @@ export default {
                 this.total = res.data.total || 50;
             });
         },
+        //分配角色
         handleSelectRole(index,row){
-            console.log(index)
-            console.log(row)
             this.allocAdminId = row.id;
             this.allocDialogVisible = true;
             this.getRoleListByAdmin(row.id);
+        },
+        //分配帐套
+        handleSelectAccount(index,row){
+            this.allocAdminId = row.id;
+            this.allocAccountDialogVisible = true;
+            this.getAccountListByAdmin(row.id);
         },
         // 触发搜索按钮
         handleSearch() {
@@ -420,6 +457,7 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
+        //分配角色
         handleAllocDialogConfirm(){
             this.$confirm('是否要确认?', '提示', {
                 confirmButtonText: '确定',
@@ -435,6 +473,26 @@ export default {
                         type: 'success'
                     });
                     this.allocDialogVisible = false;
+                })
+            })
+        },
+
+        //分配帐套
+        handleAllocAccountDialogConfirm(){
+            this.$confirm('是否要确认?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                let params = new URLSearchParams();
+                params.append("userId", this.allocAdminId);
+                params.append("accountCodes", this.accountCodes);
+                allocAccount(params).then(response => {
+                    this.$message({
+                        message: '分配成功！',
+                        type: 'success'
+                    });
+                    this.allocAccountDialogVisible = false;
                 })
             })
         },
@@ -530,7 +588,7 @@ export default {
             console.log(userId)
             let params = new URLSearchParams()
             params.append("userId",userId)
-            getRoleByAdmin(params).then(res=>{
+            listRoleByUserId(params).then(res=>{
                 let allocRoleList = res.data;
                 this.allocRoleIds = [];
                 if(allocRoleList != null && allocRoleList.length > 0){
@@ -540,11 +598,31 @@ export default {
                 }
             })
         },
+        //根据用户ID获取所拥有的帐套
+        getAccountListByAdmin(userId){
+            let params = new URLSearchParams()
+            params.append("userId",userId)
+            listAccountByUserId(params).then(res=>{
+                let accountList = res.data;
+                this.accountCodes = [];
+                if(accountList != null && accountList.length > 0){
+                    for(let i =0; i<accountList.length;i++){
+                        this.accountCodes.push(accountList[i].accountCode)
+                    }
+                }
+            })
+        },
 
         //获取全部角色
-        fetchAllRoleList(){
+        getAllRoleList(){
             fetchAllRoleList().then(res=>{
                 this.allRoleList = res.data;
+            })
+        },
+        //获取全部帐套
+        getAllAccountList(){
+            listAccountData().then(res=>{
+                this.allAccountList = res.data;
             })
         }
 
@@ -553,7 +631,8 @@ export default {
     created() {
         this.initOrderCountDate();
         this.getData();
-        this.fetchAllRoleList();
+        this.getAllRoleList();
+        this.getAllAccountList();
     }
 
 };
