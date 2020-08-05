@@ -151,7 +151,7 @@
                         </el-input>
                     </el-form-item>
                     <el-form-item label="父科目编号：" prop="parentName">
-                        <el-input v-model="subject.parentName" style="width: 250px">
+                        <el-input v-model="subject.parentName" disabled="true" style="width: 250px">
                             <el-button slot="append" icon="el-icon-search" @click="handleClickSubject()"></el-button>
                         </el-input>
                     </el-form-item>
@@ -167,10 +167,11 @@
                 </el-form-item>
 
 
-                <el-form-item label="借贷方向：" prop="borrowFlag">
+                <el-form-item label="借贷方向：">
                     <el-radio-group  v-model="subject.borrowFlag">
                         <el-radio :label="0">借</el-radio>
                         <el-radio :label="1">贷</el-radio>
+                        <el-radio :label="2">其他</el-radio>
                     </el-radio-group>
                 </el-form-item>
 
@@ -209,7 +210,7 @@ const defaultSubject = {
     parentCode: null,
     subjectType: null,
     parentName: null,
-    borrowFlag: null,
+    borrowFlag: 2,
     remark: null
 };
 
@@ -249,9 +250,6 @@ export default {
                 subjectType: [
                     { required: true, message: '请选择科目类型', trigger: 'blur' }
                 ],
-                borrowFlag: [
-                    { required: true, message: '请选择借贷方向', trigger: 'blur' }
-                ],
             }
         };
     },
@@ -283,6 +281,8 @@ export default {
                 return '贷';
             }else if (value === 0) {
                 return '借';
+            }else if (value === 2) {
+                return '其他';
             }
             else {
                 return 'N/A';
