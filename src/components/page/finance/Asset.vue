@@ -67,6 +67,7 @@
                     class="handle-del mr10"
                     @click="handleAdd"
             >添加</el-button>
+
         </el-card>
 
             <el-table
@@ -231,6 +232,7 @@
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import { createAsset, deleteAsset,  updateAsset} from '@/api/asset';
     import { fetchTreeList} from '@/api/subject';
+
 
     const defaultListQuery = {
     accountCode: null,
