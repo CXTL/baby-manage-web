@@ -1,6 +1,13 @@
 <template>
+
   <div class="app-container">
     <div class="statistics-layout">
+      <el-button
+              type="primary"
+              icon="el-icon-circle-plus-outline"
+              class="handle-del mr10"
+              @click="exportExcel"
+      >导出</el-button>
       <div class="layout-title">资产统计</div>
       <el-row>
         <el-col>
@@ -20,29 +27,18 @@
             </el-date-picker>
             <div>
               <ve-line
-                :data="chartData"
-                :legend-visible="false"
-                :loading="loading"
-                :data-empty="dataEmpty"
-                :settings="chartSettings"></ve-line>
+                      :data="chartData"
+                      :legend-visible="false"
+                      :loading="loading"
+                      :data-empty="dataEmpty"
+                      :settings="chartSettings"></ve-line>
             </div>
           </div>
         </el-col>
       </el-row>
     </div>
-
-
-
     <div class="statistics-layout">
-      <div class="layout-title">资产详情
-        <el-button
-              type="primary"
-              icon="el-icon-download"
-              class="handle-del mr10"
-              @click="exceldownload"
-      >导出</el-button>
-      </div>
-
+      <div class="layout-title">资产详情</div>
       <el-table
               :data="tableData"
               border
@@ -82,14 +78,14 @@
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
   import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/home';
   import { fetchAssetReportData } from '@/api/index';
-  import { exportAsset} from '@/api/assetReport';
+  import { exportExcel } from '@/api/base';
 
- const defaultListQuery ={
+  const defaultListQuery ={
     accountCode: null,
     endTime:'',
     startTime: '',
-         page: 1,
-         size: 10
+    page: 1,
+    size: 10
   };
 
   const homeReportData ={
@@ -150,7 +146,7 @@
           xAxisType: 'time',
           area:false,
           axisSite: { right: ['totalAsset']},
-        labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出', 'totalAsset': '总资产' ,'totalProfit': '总利润'}},
+          labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出', 'totalAsset': '总资产' ,'totalProfit': '总利润'}},
         chartData: {
           columns: [],
           rows: []
@@ -158,8 +154,6 @@
         loading: false,
         tableData:[],
         dataEmpty: false,
-        idx: -1,
-        id: -1,
         img_home_order,
         img_home_today_amount,
         img_home_yesterday_amount
@@ -169,6 +163,22 @@
     methods:{
       handleDateChange(){
         this.getAssetChartData();
+      },
+      exportExcel(){
+        exportExcel().then(res => {
+          console.log(res)
+          const link = document.createElement("a");
+          let blob = new Blob([res.data], {
+            type: "application/vnd.ms-excel"
+          });
+          link.style.display = "none";
+          link.href = URL.createObjectURL(blob);
+          link.setAttribute("download", "统计.xls");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+        });
       },
       initOrderCountDate(){
         const end = new Date();
@@ -185,20 +195,20 @@
         this.query.endTime = getLastTimestamp(this.queryDate[1]);
         fetchAssetReportData(this.query).then(res => {
           this.listLoading=false;
-          this.tableData = res.data.list;
+          this.tableData = res.data;
           this.total = res.data.total || 50;
         });
       },
       // 分页导航
       handlePageChange(val) {
         this.query.page = val;
-        this.getHomeReportData();
+        this.getData();
       },
       // 分页导航
       handleSizeChange(val) {
         this.query.page = 1;
         this.query.size = val;
-        this.getHomeReportData();
+        this.getData();
       },
       //获取报表数据
       getAssetChartData(){
@@ -216,28 +226,7 @@
           this.dataEmpty = false;
           this.loading = false
         }, 500)
-      },
-      exceldownload() {
-        // api格式的统一请求配置，本文最后会展示，根据实际情况修改，可以改成axios请求，下面的内容基本不需要修改
-        exportAsset(this.query).then(res => {
-          //将文件流转成blob形式
-          console.log(1)
-          const blob = res //new Blob([res],{type: 'application/vnd.ms-excel'});
-          console.log(blob)
-          let filename ='asset.xls';
-          //创建一个超链接，将文件流赋进去，然后实现这个超链接的单击事件
-          const elink = document.createElement('a');
-          elink.download = filename;
-          elink.style.display = 'none';
-          elink.href = URL.createObjectURL(blob);
-          document.body.appendChild(elink);
-          elink.click();
-          URL.revokeObjectURL(elink.href); // 释放URL 对象
-          document.body.removeChild(elink);
-        }).catch(error => {
-          console.log(error)
-        })
-      },
+      }
     },
     created(){
       this.initOrderCountDate();

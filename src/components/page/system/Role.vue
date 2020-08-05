@@ -132,12 +132,13 @@
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="role"
-                     ref="roleForm"
+                     ref="role"
+                     :rules="rules"
                      label-width="150px" size="small">
-                    <el-form-item label="名称：">
+                    <el-form-item label="名称：" prop="name">
                         <el-input v-model="role.name" style="width: 250px"></el-input>
                     </el-form-item>
-                <el-form-item label="是否启用：">
+                <el-form-item label="是否启用："  prop="isEnable">
                     <el-radio-group v-model="role.isEnable">
                         <el-radio :label="1">是</el-radio>
                         <el-radio :label="0">否</el-radio>
@@ -153,7 +154,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm('role')" size="small">确 定</el-button>
       </span>
         </el-dialog>
 
@@ -176,7 +177,7 @@ const defaultListQuery = {
 const defaultRole = {
     id: null,
     name: null,
-    isEnable: 1,
+    isEnable: null,
     remark: null
 };
 
@@ -221,7 +222,16 @@ export default {
             form: {},
             role: Object.assign({}, defaultRole),
             idx: -1,
-            id: -1
+            id: -1,
+            rules: {
+
+                name: [
+                    { required: true, message: '请输入角色名称', trigger: 'blur' },
+                ],
+                isEnable: [
+                    {  required: true, message: '请选择是否启用', trigger: 'change' }
+                ]
+            }
         };
     },
 
@@ -348,32 +358,44 @@ export default {
 
         },
         //页面编辑
-        handleDialogConfirm() {
-            this.$confirm('是否要确认?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                if (this.isEdit) {
-                    updateRole(this.role).then(response => {
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
+        handleDialogConfirm(role) {
+
+
+            this.$refs[role].validate((valid) => {
+                if (valid) {
+                    this.$confirm('是否要确认?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        if (this.isEdit) {
+                            updateRole(this.role).then(response => {
+                                this.$message({
+                                    message: '修改成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        } else {
+                            createRole(this.role).then(response => {
+                                this.$message({
+                                    message: '添加成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        }
                     })
                 } else {
-                    createRole(this.role).then(response => {
-                        this.$message({
-                            message: '添加成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
+                    console.log('error submit!!');
+                    return false;
                 }
-            })
+            });
+
+
+
         },
 
         // 分页导航
