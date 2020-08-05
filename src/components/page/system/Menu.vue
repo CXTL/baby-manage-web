@@ -176,7 +176,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm('menu')" size="small">确 定</el-button>
       </span>
         </el-dialog>
 
@@ -187,6 +187,7 @@
     import { fetchMenuData } from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import {createMenu,updateMenu,deleteMenu} from '@/api/menu';
+    import {isvalidNumber} from '@/utils/validate';
 
 const defaultListQuery = {
     name: null,
@@ -212,6 +213,13 @@ const defaultMenu = {
 export default {
     name: 'basetable',
     data() {
+        const validateNumber = (rule, value, callback) => {
+            if (!isvalidNumber(value)) {
+                callback(new Error('请输入整数!'))
+            } else {
+                callback()
+            }
+        };
         return {
             pickerOptions: {
                 shortcuts: [{
@@ -254,10 +262,25 @@ export default {
             rules: {
 
                 name: [
-                    { required: true, message: '请输入角色名称', trigger: 'blur' },
+                    { required: true, message: '请输入菜单名称', trigger: 'blur' },
                 ],
-                isEnable: [
-                    {  required: true, message: '请选择是否启用', trigger: 'change' }
+                pid: [
+                    {  required: true, message: '请选择父类菜单', trigger: 'change' }
+                ],
+                path: [
+                    {  required: true, message: '请输入路径', trigger: 'change' }
+                ],
+                sort: [
+                    {  required: true, trigger: 'change', validator: validateNumber  }
+                ],
+                permission: [
+                    {  required: true, message: '请输入权限', trigger: 'change' }
+                ],
+                type: [
+                    {  required: true, message: '请选择资源类型', trigger: 'change' }
+                ],
+                hidden: [
+                    {  required: true, message: '请选择是否隐藏', trigger: 'change' }
                 ]
             }
         };
@@ -386,34 +409,47 @@ export default {
             })
 
         },
-        //页面编辑
-        handleDialogConfirm() {
-            this.$confirm('是否要确认?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                if (this.isEdit) {
-                    updateMenu(this.menu).then(response => {
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
+
+        //编辑页面
+        handleDialogConfirm(menu) {
+
+            this.$refs[menu].validate((valid) => {
+                if (valid) {
+                    this.$confirm('是否要确认?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        if (this.isEdit) {
+                            updateMenu(this.menu).then(response => {
+                                this.$message({
+                                    message: '修改成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        } else {
+                            createMenu(this.menu).then(response => {
+                                this.$message({
+                                    message: '添加成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        }
                     })
                 } else {
-                    createMenu(this.menu).then(response => {
-                        this.$message({
-                            message: '添加成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
+                    console.log('error submit!!');
+                    return false;
                 }
-            })
+            });
+
+
+
         },
+
 
         // 分页导航
         handlePageChange(val) {

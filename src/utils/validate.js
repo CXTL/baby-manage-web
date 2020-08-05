@@ -27,3 +27,15 @@ export function isvalidEmail(str) {
   const reg = /^\w*@[-a-zA-Z0-9]{1,20}\.[0-9a-z]{2,3}$/;
   return reg.test(str);
 }
+
+// 整数验证
+export function isvalidNumber(str) {
+  const reg = /^-?\d+$/;
+  return reg.test(str);
+}
+
+// 只能输入数字和两位小数数验证
+export function isvalidBigDecimal(str) {
+  const reg = /^\d+(\.\d{0,2})?$/;
+  return reg.test(str);
+}

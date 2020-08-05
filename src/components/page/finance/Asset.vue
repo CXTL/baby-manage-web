@@ -142,9 +142,10 @@
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="asset"
-                     ref="assetForm"
+                     ref="asset"
+                     :rules="rules"
                      label-width="150px" size="small">
-                <el-form-item label="帐套名称：">
+                <el-form-item label="帐套名称：" prop="accountCode">
                     <el-select v-model="asset.accountCode" placeholder="请选择" style="width: 250px">
                         <el-option
                                 v-for="item in accountData"
@@ -154,27 +155,27 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="科目名称：">
+                <el-form-item label="科目名称：" prop="subjectName">
                     <el-input v-model="asset.subjectName" style="width: 250px">
                         <el-button slot="append" icon="el-icon-search" @click="handleClickSubject()"></el-button>
                     </el-input>
                 </el-form-item>
-                    <el-form-item label="应收金额：">
+                    <el-form-item label="应收金额：" prop="receiveAmount">
                         <el-input v-model="asset.receiveAmount" style="width: 250px"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="应付金额：">
+                    <el-form-item label="应付金额：" prop="payAmount">
                         <el-input v-model="asset.payAmount" style="width: 250px"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="实收金额：">
+                    <el-form-item label="实收金额：" prop="realReceiveAmount">
                         <el-input v-model="asset.realReceiveAmount" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="实付金额：">
+                    <el-form-item label="实付金额：" prop="realPayAmount">
                         <el-input v-model="asset.realPayAmount" style="width: 250px"></el-input>
                     </el-form-item>
 
-                <el-form-item label="资产类型：">
+                <el-form-item label="资产类型：" prop="type">
                     <el-radio-group v-model="asset.type">
                         <el-radio :label="1">收入</el-radio>
                         <el-radio :label="2">支出</el-radio>
@@ -192,7 +193,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm('asset')" size="small">确 定</el-button>
       </span>
         </el-dialog>
 
@@ -232,7 +233,7 @@
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import { createAsset, deleteAsset,  updateAsset} from '@/api/asset';
     import { fetchTreeList} from '@/api/subject';
-
+    import {isvalidBigDecimal} from '@/utils/validate';
 
     const defaultListQuery = {
     accountCode: null,
@@ -247,10 +248,10 @@ const defaultAsset = {
     accountCode: null,
     subjectCode: null,
     subjectName: null,
-    receiveAmount: null,
-    payAmount: null,
-    realReceiveAmount: null,
-    realPayAmount: null,
+    receiveAmount: 0,
+    payAmount: 0,
+    realReceiveAmount: 0,
+    realPayAmount: 0,
     type: null,
     remark: null
 };
@@ -258,6 +259,13 @@ const defaultAsset = {
 export default {
     name: 'basetable',
     data() {
+        const validateBigDecimal = (rule, value, callback) => {
+            if (!isvalidBigDecimal(value)) {
+                callback(new Error('请输入整数或两位小数的数字'))
+            } else {
+                callback()
+            }
+        };
         return {
             subjectTreeList:[],
             defaultProps: {
@@ -302,7 +310,31 @@ export default {
             form: {},
             asset: Object.assign({}, defaultAsset),
             idx: -1,
-            id: -1
+            id: -1,
+            rules: {
+
+                accountCode: [
+                    { required: true, message: '请选择帐套', trigger: 'blur' }
+                ],
+                subjectName: [
+                    { required: true, message: '请选择科目', trigger: 'blur' }
+                ],
+                receiveAmount: [
+                    { required: true,trigger: 'blur' , validator: validateBigDecimal}
+                ],
+                payAmount: [
+                    { required: true, trigger: 'blur' , validator: validateBigDecimal}
+                ],
+                realReceiveAmount: [
+                    { required: true,  trigger: 'blur', validator: validateBigDecimal }
+                ],
+                realPayAmount: [
+                    { required: true,  trigger: 'blur', validator: validateBigDecimal }
+                ],
+                type: [
+                    { required: true, message: '请选择类型', trigger: 'blur' }
+                ],
+            }
         };
     },
 
@@ -460,34 +492,45 @@ export default {
                 });
             })
         },
+
+
         //页面编辑
-        handleDialogConfirm() {
-            this.$confirm('是否要确认?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                if (this.isEdit) {
-                    updateAsset(this.asset).then(response => {
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
+        handleDialogConfirm(asset) {
+
+            this.$refs[asset].validate((valid) => {
+                if (valid) {
+                    this.$confirm('是否要确认?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        if (this.isEdit) {
+                            updateAsset(this.asset).then(response => {
+                                this.$message({
+                                    message: '修改成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        } else {
+                            createAsset(this.asset).then(response => {
+                                this.$message({
+                                    message: '添加成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        }
                     })
                 } else {
-                    createAsset(this.asset).then(response => {
-                        this.$message({
-                            message: '添加成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
+                    console.log('error submit!!');
+                    return false;
                 }
-            })
+            });
         },
+
 
         // 分页导航
         handlePageChange(val) {

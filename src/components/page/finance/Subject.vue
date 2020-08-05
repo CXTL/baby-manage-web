@@ -139,23 +139,24 @@
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="subject"
-                     ref="subjectForm"
+                     ref="subject"
+                     :rules="rules"
                      label-width="150px" size="small">
-                    <el-form-item label="科目编号：">
+                    <el-form-item label="科目编号：" prop="subjectCode">
                         <el-input v-model="subject.subjectCode" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="科目名称：">
+                    <el-form-item label="科目名称：" prop="subjectName">
                         <el-input v-model="subject.subjectName" style="width: 250px">
 
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="父科目编号：">
+                    <el-form-item label="父科目编号：" prop="parentName">
                         <el-input v-model="subject.parentName" style="width: 250px">
                             <el-button slot="append" icon="el-icon-search" @click="handleClickSubject()"></el-button>
                         </el-input>
                     </el-form-item>
 
-                <el-form-item label="科目类型：">
+                <el-form-item label="科目类型：" prop="subjectType">
                     <el-radio-group  v-model="subject.subjectType">
                         <el-radio :label="1">资产</el-radio>
                         <el-radio :label="2">负载</el-radio>
@@ -166,7 +167,7 @@
                 </el-form-item>
 
 
-                <el-form-item label="借贷方向：">
+                <el-form-item label="借贷方向：" prop="borrowFlag">
                     <el-radio-group  v-model="subject.borrowFlag">
                         <el-radio :label="0">借</el-radio>
                         <el-radio :label="1">贷</el-radio>
@@ -184,7 +185,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm('subject')" size="small">确 定</el-button>
       </span>
         </el-dialog>
     </div>
@@ -233,7 +234,25 @@ export default {
             form: {},
             subject: Object.assign({}, defaultSubject),
             idx: -1,
-            id: -1
+            id: -1,
+            rules: {
+
+                subjectCode: [
+                    { required: true, message: '请输入科目编号', trigger: 'blur' }
+                ],
+                subjectName: [
+                    { required: true, message: '请输入科目名称', trigger: 'blur' }
+                ],
+                parentName: [
+                    { required: true, message: '请选择父科目名称', trigger: 'blur' }
+                ],
+                subjectType: [
+                    { required: true, message: '请选择科目类型', trigger: 'blur' }
+                ],
+                borrowFlag: [
+                    { required: true, message: '请选择借贷方向', trigger: 'blur' }
+                ],
+            }
         };
     },
 
@@ -407,34 +426,48 @@ export default {
                 });
             })
         },
+
         //页面编辑
-        handleDialogConfirm() {
-            this.$confirm('是否要确认?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                if (this.isEdit) {
-                    updateSubject(this.subject).then(response => {
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
+        handleDialogConfirm(subject) {
+
+            this.$refs[subject].validate((valid) => {
+                if (valid) {
+                    this.$confirm('是否要确认?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        if (this.isEdit) {
+                            updateSubject(this.subject).then(response => {
+                                this.$message({
+                                    message: '修改成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        } else {
+                            createSubject(this.subject).then(response => {
+                                this.$message({
+                                    message: '添加成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        }
                     })
                 } else {
-                    createSubject(this.subject).then(response => {
-                        this.$message({
-                            message: '添加成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
+                    console.log('error submit!!');
+                    return false;
                 }
-            })
+            });
+
+
+
         },
+
+
 
         // 分页导航
         handlePageChange(val) {

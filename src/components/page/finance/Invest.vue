@@ -133,12 +133,13 @@
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="invest"
-                     ref="investForm"
+                     :rules="rules"
+                     ref="invest"
                      label-width="150px" size="small">
 
 
 
-                <el-form-item label="帐套名称：">
+                <el-form-item label="帐套名称：" prop="accountCode">
                     <el-select v-model="invest.accountCode" placeholder="请选择" style="width: 250px">
                         <el-option
                                 v-for="item in accountData"
@@ -148,23 +149,23 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                    <el-form-item label="科目编号：">
+                    <el-form-item label="科目编号："  prop="subjectName">
                         <el-input v-model="invest.subjectName" style="width: 250px">
                             <el-button slot="append" icon="el-icon-search" @click="handleClickSubject()"></el-button>
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="投资人名称：">
+                    <el-form-item label="投资人名称："  prop="investName">
                         <el-input v-model="invest.investName" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="投资款：">
+                    <el-form-item label="投资款："  prop="investFund">
                         <el-input v-model="invest.investFund" style="width: 250px"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="投资总额：">
+                    <el-form-item label="投资总额："  prop="investAmount">
                         <el-input v-model="invest.investAmount" style="width: 250px"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="投资比例：">
+                    <el-form-item label="投资比例："  prop="investRatio">
                         <el-input v-model="invest.investRatio" style="width: 250px"></el-input>
                     </el-form-item>
 
@@ -180,7 +181,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm('invest')" size="small">确 定</el-button>
       </span>
         </el-dialog>
 
@@ -219,6 +220,7 @@
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import { createInvest, deleteInvest,  updateInvest} from '@/api/invest';
     import { fetchTreeList} from '@/api/subject';
+    import {isvalidBigDecimal} from '@/utils/validate';
 
     const defaultListQuery = {
     accountCode: null,
@@ -234,15 +236,22 @@ const defaultInvest = {
     subjectCode: null,
     subjectName: null,
     investName: null,
-    investFund: null,
-    investAmount: null,
-    investRatio: null,
+    investFund: 0,
+    investAmount: 0,
+    investRatio: 0,
     remark: null
 };
 
 export default {
     name: 'basetable',
     data() {
+        const validateBigDecimal = (rule, value, callback) => {
+            if (!isvalidBigDecimal(value)) {
+                callback(new Error('请输入整数或两位小数的数字'))
+            } else {
+                callback()
+            }
+        };
         return {
             subjectTreeList:[],
             defaultProps: {
@@ -287,7 +296,28 @@ export default {
             form: {},
             invest: Object.assign({}, defaultInvest),
             idx: -1,
-            id: -1
+            id: -1,
+            rules: {
+
+                accountCode: [
+                    { required: true, message: '请选择帐套', trigger: 'blur' }
+                ],
+                subjectName: [
+                    { required: true, message: '请选择科目', trigger: 'blur' }
+                ],
+                investName: [
+                    { required: true, message: '请输入投资人名称', trigger: 'blur' }
+                ],
+                investFund: [
+                    { required: true,trigger: 'blur' , validator: validateBigDecimal}
+                ],
+                investAmount: [
+                    { required: true, trigger: 'blur' , validator: validateBigDecimal}
+                ],
+                investRatio: [
+                    { required: true,  trigger: 'blur', validator: validateBigDecimal }
+                ]
+            }
         };
     },
 
@@ -461,33 +491,46 @@ export default {
                 });
             })
         },
+
+
         //页面编辑
-        handleDialogConfirm() {
-            this.$confirm('是否要确认?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                if (this.isEdit) {
-                    updateInvest(this.invest).then(response => {
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
+        handleDialogConfirm(invest) {
+
+            this.$refs[invest].validate((valid) => {
+                if (valid) {
+                    this.$confirm('是否要确认?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        if (this.isEdit) {
+                            updateInvest(this.invest).then(response => {
+                                this.$message({
+                                    message: '修改成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        } else {
+                            createInvest(this.invest).then(response => {
+                                this.$message({
+                                    message: '添加成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        }
                     })
                 } else {
-                    createInvest(this.invest).then(response => {
-                        this.$message({
-                            message: '添加成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
+                    console.log('error submit!!');
+                    return false;
                 }
-            })
+            });
+
+
+
         },
 
         // 分页导航

@@ -135,12 +135,13 @@
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="account"
-                     ref="accountForm"
+                     ref="account"
+                     :rules="rules"
                      label-width="150px" size="small">
-                    <el-form-item label="帐套编号：">
+                    <el-form-item label="帐套编号：" prop="accountCode">
                         <el-input v-model="account.accountCode" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="帐套名称：">
+                    <el-form-item label="帐套名称：" prop="accountName">
                         <el-input v-model="account.accountName" style="width: 250px"></el-input>
                     </el-form-item>
                     <el-form-item label="公司名称：">
@@ -171,7 +172,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm('account')" size="small">确 定</el-button>
       </span>
         </el-dialog>
     </div>
@@ -181,6 +182,7 @@
     import { fetchAccountData,listAccountData } from '@/api/index';
     import { formatDate ,getFirstTimestamp, getLastTimestamp} from '@/utils/date';
     import { createAccount, deleteAccount,  updateAccount} from '@/api/account';
+    import {isvalidNumber} from '@/utils/validate';
 
     const defaultListQuery = {
     accountCode: null,
@@ -206,7 +208,15 @@ const defaultAccount = {
 export default {
     name: 'basetable',
     data() {
+        const validateNumber = (rule, value, callback) => {
+            if (!isvalidNumber(value)) {
+                callback(new Error('请输入整数!'))
+            } else {
+                callback()
+            }
+        };
         return {
+
             accountData:[],
             pickerOptions: {
                 shortcuts: [{
@@ -244,7 +254,16 @@ export default {
             form: {},
             account: Object.assign({}, defaultAccount),
             idx: -1,
-            id: -1
+            id: -1,
+            rules: {
+
+                accountCode: [
+                    { required: true, trigger: 'blur', validator: validateNumber }
+                ],
+                accountName: [
+                    { required: true, message: '请输入帐套名称', trigger: 'blur' }
+                ]
+            }
         };
     },
 
@@ -362,34 +381,48 @@ export default {
                 });
             })
         },
+
         //页面编辑
-        handleDialogConfirm() {
-            this.$confirm('是否要确认?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                if (this.isEdit) {
-                    updateAccount(this.account).then(response => {
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
+        handleDialogConfirm(account) {
+
+            this.$refs[account].validate((valid) => {
+                if (valid) {
+                    this.$confirm('是否要确认?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        if (this.isEdit) {
+                            updateAccount(this.account).then(response => {
+                                this.$message({
+                                    message: '修改成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        } else {
+                            createAccount(this.account).then(response => {
+                                this.$message({
+                                    message: '添加成功！',
+                                    type: 'success'
+                                });
+                                this.dialogVisible =false;
+                                this.getData();
+                            })
+                        }
                     })
                 } else {
-                    createAccount(this.account).then(response => {
-                        this.$message({
-                            message: '添加成功！',
-                            type: 'success'
-                        });
-                        this.dialogVisible =false;
-                        this.getData();
-                    })
+                    console.log('error submit!!');
+                    return false;
                 }
-            })
+            });
+
+
+
         },
+
+
 
         // 分页导航
         handlePageChange(val) {
