@@ -87,7 +87,7 @@
                 <el-table-column label="应付金额" prop="payAmount" align="center"></el-table-column>
                 <el-table-column label="实收金额" prop="realReceiveAmount" align="center"></el-table-column>
                 <el-table-column label="实付金额" prop="realPayAmount" align="center"></el-table-column>
-                <el-table-column label="资产类型" align="center">
+                <el-table-column label="收支类型" align="center">
                     <template slot-scope="scope">
                         {{scope.row.type | formatType}}
                     </template>
@@ -96,6 +96,11 @@
                 <el-table-column label="金额" prop="amount" align="center"></el-table-column>
                 <el-table-column label="资产变动前" prop="balanceBefore" align="center"></el-table-column>
                 <el-table-column label="资产变动后" prop="balanceAfter" align="center"></el-table-column>
+                <el-table-column label="收支日期" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.assetDate | formatTime}}
+                    </template>
+                </el-table-column>
                 <el-table-column label="创建时间" align="center">
                     <template slot-scope="scope">
                         {{scope.row.createTime | formatTime}}
@@ -175,7 +180,7 @@
                         <el-input v-model="asset.realPayAmount" style="width: 250px"></el-input>
                     </el-form-item>
 
-                <el-form-item label="资产类型：" prop="type">
+                <el-form-item label="收支类型：" prop="type">
                     <el-radio-group v-model="asset.type">
                         <el-radio :label="1">收入</el-radio>
                         <el-radio :label="2">支出</el-radio>
@@ -183,6 +188,15 @@
                     </el-radio-group>
                 </el-form-item>
 
+                <el-form-item label="收支日期："  prop="investDate">
+                    <el-date-picker
+                            style="width: 250px"
+                            v-model="asset.assetDate"
+                            type="date"
+                            placeholder="选择日期">
+                    </el-date-picker>
+
+                </el-form-item>
                     <el-form-item label="备注：">
                         <el-input v-model="asset.remark"
                                   type="textarea"
@@ -249,6 +263,7 @@ const defaultAsset = {
     subjectCode: null,
     subjectName: null,
     receiveAmount: 0,
+    assetDate: '',
     payAmount: 0,
     realReceiveAmount: 0,
     realPayAmount: 0,
@@ -505,6 +520,7 @@ export default {
                         type: 'warning'
                     }).then(() => {
                         if (this.isEdit) {
+                            this.asset.assetDate = this.asset.assetDate.getTime()
                             updateAsset(this.asset).then(response => {
                                 this.$message({
                                     message: '修改成功！',
@@ -514,6 +530,7 @@ export default {
                                 this.getData();
                             })
                         } else {
+                            this.asset.assetDate = this.asset.assetDate.getTime()
                             createAsset(this.asset).then(response => {
                                 this.$message({
                                     message: '添加成功！',
