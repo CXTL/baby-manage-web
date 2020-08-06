@@ -83,15 +83,21 @@
                 <el-table-column  label="帐套名称"  prop="accountName" align="center"></el-table-column>
                 <el-table-column  label="科目名称"  prop="subjectName" align="center"></el-table-column>
                 <el-table-column  label="投资人名称" prop="investName"  align="center"></el-table-column>
-                <el-table-column label="投资款" prop="investFund" align="center"></el-table-column>
+                <el-table-column label="实际投资金额" prop="investFund" align="center"></el-table-column>
                 <el-table-column label="投资总额" prop="investAmount" align="center"></el-table-column>
+                <el-table-column label="应投资总额" prop="shouldInvestAmount" align="center"></el-table-column>
                 <el-table-column label="投资比例" prop="investRatio" align="center"></el-table-column>
-
+                <el-table-column label="投资日期" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.investDate | formatTime}}
+                    </template>
+                </el-table-column>
                 <el-table-column label="创建时间" align="center">
                     <template slot-scope="scope">
                         {{scope.row.createTime | formatTime}}
                     </template>
                 </el-table-column>
+
                 <el-table-column label="备注" prop="remark" align="center"></el-table-column>
 
                 <el-table-column label="操作" width="180" align="center">
@@ -157,17 +163,24 @@
                     <el-form-item label="投资人名称："  prop="investName">
                         <el-input v-model="invest.investName" style="width: 250px"></el-input>
                     </el-form-item>
-                    <el-form-item label="投资款："  prop="investFund">
+                    <el-form-item label="实际投资金额："  prop="investFund">
                         <el-input v-model="invest.investFund" style="width: 250px"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="投资总额："  prop="investAmount">
-                        <el-input v-model="invest.investAmount" style="width: 250px"></el-input>
-                    </el-form-item>
+                <el-form-item label="应投资总额："  prop="shouldInvestAmount">
+                    <el-input v-model="invest.shouldInvestAmount" style="width: 250px"></el-input>
+                </el-form-item>
 
-                    <el-form-item label="投资比例："  prop="investRatio">
-                        <el-input v-model="invest.investRatio" style="width: 250px"></el-input>
-                    </el-form-item>
+
+                <el-form-item label="投资日期："  prop="investDate">
+                    <el-date-picker
+                            style="width: 250px"
+                            v-model="invest.investDate"
+                            type="date"
+                            placeholder="选择日期">
+                    </el-date-picker>
+
+                </el-form-item>
 
 
 
@@ -236,8 +249,10 @@ const defaultInvest = {
     subjectCode: null,
     subjectName: null,
     investName: null,
+    investDate: '',
     investFund: 0,
     investAmount: 0,
+    shouldInvestAmount: 0,
     investRatio: 0,
     remark: null
 };
@@ -308,10 +323,16 @@ export default {
                 investName: [
                     { required: true, message: '请输入投资人名称', trigger: 'blur' }
                 ],
+                investDate: [
+                    { required: true, message: '请选择投资日期', trigger: 'blur' }
+                ],
                 investFund: [
                     { required: true,trigger: 'blur' , validator: validateBigDecimal}
                 ],
                 investAmount: [
+                    { required: true, trigger: 'blur' , validator: validateBigDecimal}
+                ],
+                shouldInvestAmount: [
                     { required: true, trigger: 'blur' , validator: validateBigDecimal}
                 ],
                 investRatio: [
