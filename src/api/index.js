@@ -66,7 +66,7 @@ export const fetchAssetData = query => {
     });
 };
 
-//获取资产报表详情信息
+//获取收支报表详情信息
 export const fetchAssetReportData = query => {
     return request({
         url: '/report/asset/listAssetInfoByPage',

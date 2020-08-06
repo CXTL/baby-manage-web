@@ -68,7 +68,11 @@ export default {
                     subs: [
                         {
                             index: 'assetReport',
-                            title: '资产报表'
+                            title: '收支报表'
+                        },
+                        {
+                            index: 'investReport',
+                            title: '投资报表'
                         }
                     ]
                 },
@@ -91,7 +95,7 @@ export default {
                         },
                         {
                             index: 'asset',
-                            title: '资产管理'
+                            title: '收支管理'
                         }
                     ]
                 },

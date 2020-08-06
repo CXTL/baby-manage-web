@@ -71,8 +71,6 @@ export default new Router({
                     meta: { title: '业务日志' }
                 }
 
-
-
                 ,
                 {
                     path: '/invest',
@@ -92,12 +90,17 @@ export default new Router({
                 {
                     path: '/asset',
                     component: () => import(/* webpackChunkName: "403" */ '@/components/page/finance/Asset'),
-                    meta: { title: '资产管理' }
+                    meta: { title: '收支管理' }
                 },
                 {
                     path: '/assetReport',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/report/AccountReport'),
-                    meta: { title: '资产报表' }
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/report/AssetReport'),
+                    meta: { title: '收支报表' }
+                },
+                {
+                    path: '/investReport',
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/report/InvestReport'),
+                    meta: { title: '投资报表' }
                 },
                 {
                     path: 'allocMenu',
