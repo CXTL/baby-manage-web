@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="total-layout">
       <el-row :gutter="20">
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="total-frame">
             <img :src="img_home_order" class="total-icon">
             <div class="total-title">今日收入: ￥{{homeReportData.incomeToday}}</div>
@@ -10,7 +10,7 @@
             <div class="total-title">同比昨日:  {{homeReportData.rateIncome}}%</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="total-frame">
             <img :src="img_home_today_amount" class="total-icon">
             <div class="total-title">今日支出: ￥{{homeReportData.expenditureToday}}</div>
@@ -18,17 +18,9 @@
             <div class="total-title">同比昨日: {{homeReportData.rateExpenditure}}%</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <div class="total-frame">
             <img :src="img_home_yesterday_amount" class="total-icon">
-            <div class="total-title">今日利润: ￥{{homeReportData.profitToday}}</div>
-            <div class="total-title">昨日利润: ￥{{homeReportData.profitYesterday}}</div>
-            <div class="total-title">同比昨日: {{homeReportData.rateProfit}}%</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="total-frame">
-            <img :src="img_home_order" class="total-icon">
             <div class="total-title">今日资产: ￥{{homeReportData.assetToday}}</div>
             <div class="total-title">昨日资产: ￥{{homeReportData.assetYesterday}}</div>
             <div class="total-title">同比昨日: +{{homeReportData.rateAsset}}%</div>
@@ -92,15 +84,16 @@
     expenditureYesterday:0,
     rateExpenditure:0,
 
-    profitToday:0,
-    profitYesterday:0,
-    rateProfit:0,
+    // profitToday:0,
+    // profitYesterday:0,
+    // rateProfit:0,
 
 
     assetToday:0,
     assetYesterday:0,
     rateAsset:0
   }
+
 
   export default {
     name: 'home',
@@ -140,7 +133,7 @@
           xAxisType: 'time',
           area:false,
           axisSite: { right: ['totalAsset']},
-        labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出', 'totalAsset': '总资产' ,'totalProfit': '总利润'}},
+        labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出', 'totalAsset': '总资产'}},
         chartData: {
           columns: [],
           rows: []
@@ -182,7 +175,7 @@
           this.query.endTime = getLastTimestamp(this.queryDate[1]);
           fetchHomeChartReportData(this.query).then(res => {
             this.chartData = {
-              columns: ['date', 'totalIncome','totalExpenditure','totalAsset','totalProfit'],
+              columns: ['date', 'totalIncome','totalExpenditure','totalAsset'],
               rows: []
             };
             this.chartData.rows = res.data

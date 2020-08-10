@@ -89,7 +89,7 @@
                 <el-table-column label="投资比例" prop="investRatio" align="center"></el-table-column>
                 <el-table-column label="投资日期" align="center">
                     <template slot-scope="scope">
-                        {{scope.row.investDate | formatTime}}
+                        {{scope.row.investDate | formatDate}}
                     </template>
                 </el-table-column>
                 <el-table-column label="创建时间" align="center">
@@ -350,6 +350,13 @@ export default {
             let date = new Date(time);
             return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
         },
+        formatDate(time) {
+            if (time == null || time === '') {
+                return 'N/A';
+            }
+            let date = new Date(time);
+            return formatDate(date, 'yyyy-MM-dd')
+        },
         formatType(value) {
             if (value === 1) {
                 return '资产';
@@ -524,6 +531,7 @@ export default {
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
+                        this.invest.investDate = this.invest.investDate.getTime()
                         if (this.isEdit) {
                             updateInvest(this.invest).then(response => {
                                 this.$message({

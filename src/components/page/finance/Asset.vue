@@ -98,7 +98,7 @@
                 <el-table-column label="资产变动后" prop="balanceAfter" align="center"></el-table-column>
                 <el-table-column label="收支日期" align="center">
                     <template slot-scope="scope">
-                        {{scope.row.assetDate | formatTime}}
+                        {{scope.row.assetDate | formatDate}}
                     </template>
                 </el-table-column>
                 <el-table-column label="创建时间" align="center">
@@ -184,6 +184,7 @@
                     <el-radio-group v-model="asset.type">
                         <el-radio :label="1">收入</el-radio>
                         <el-radio :label="2">支出</el-radio>
+                        <el-radio :label="3">投资</el-radio>
                         <el-radio :label="0">其他</el-radio>
                     </el-radio-group>
                 </el-form-item>
@@ -362,11 +363,21 @@ export default {
             return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
         },
 
+        formatDate(time) {
+            if (time == null || time === '') {
+                return 'N/A';
+            }
+            let date = new Date(time);
+            return formatDate(date, 'yyyy-MM-dd')
+        },
+
         formatType(value) {
             if (value === 1) {
                 return '收入';
             }else if (value === 2) {
                 return '支出';
+            }else if (value === 3) {
+                return '投资';
             }else if (value === 0) {
                 return '其他';
             }
