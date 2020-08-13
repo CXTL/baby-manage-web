@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="statistics-layout">
-      <div class="layout-title">资产统计</div>
+      <div class="layout-title">收支统计</div>
       <el-row>
         <el-col>
           <div style="padding: 10px;border-left:1px solid #DCDFE6">
@@ -34,7 +34,7 @@
 
 
     <div class="statistics-layout">
-      <div class="layout-title">资产详情 <el-button
+      <div class="layout-title">收支详情 <el-button
               type="primary"
               icon="el-icon-download"
               class="handle-del mr10"
@@ -48,12 +48,10 @@
               header-cell-class-name="table-header"
       >
 
-        <el-table-column prop="startTime" label="开始时间" align="center"></el-table-column>
-        <el-table-column prop="endTime" label="结束时间" align="center"></el-table-column>
+        <el-table-column prop="startTime" label="收支日期" align="center"></el-table-column>
         <el-table-column prop="totalIncome" label="总收入"  align="center"></el-table-column>
         <el-table-column prop="totalExpenditure"  label="总支出" align="center"></el-table-column>
-        <el-table-column prop="totalProfit" label="总利润" align="center"></el-table-column>
-        <el-table-column prop="totalAsset"  label="总资产" align="center"></el-table-column>
+
       </el-table>
 
 
@@ -78,7 +76,7 @@
   import img_home_order from '@/assets/img/home_order.png';
   import img_home_today_amount from '@/assets/img/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
-  import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/home';
+  import {  fetchHomeChartReportData} from '@/api/home';
   import { fetchAssetReportData } from '@/api/index';
   import { exportAsset} from '@/api/assetReport';
 
@@ -148,7 +146,7 @@
           xAxisType: 'time',
           area:false,
           axisSite: { right: ['totalAsset']},
-          labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出', 'totalAsset': '总资产' ,'totalProfit': '总利润'}},
+          labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出'}},
         chartData: {
           columns: [],
           rows: []
@@ -205,7 +203,7 @@
           this.query.endTime = getLastTimestamp(this.queryDate[1]);
           fetchHomeChartReportData(this.query).then(res => {
             this.chartData = {
-              columns: ['date', 'totalIncome','totalExpenditure','totalAsset','totalProfit'],
+              columns: ['date', 'totalIncome','totalExpenditure'],
               rows: []
             };
             this.chartData.rows = res.data

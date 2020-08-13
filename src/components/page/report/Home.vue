@@ -1,5 +1,57 @@
 <template>
   <div class="app-container">
+    <el-card class="filter-container" shadow="never">
+      <div>
+        <el-button
+                style="float:right"
+                type="primary"
+                icon="el-icon-search"
+                @click="handleSearch()"
+                size="small">
+          搜索
+        </el-button>
+        <el-button
+                style="float:right;margin-right: 15px"
+                @click="handleResetSearch()"
+                size="small">
+          重置
+        </el-button>
+      </div>
+      <div style="margin-top: 15px">
+        <el-form :inline="true" :model="query" size="small" label-width="140px">
+          <!--                    <el-form-item label="帐套名称：">-->
+          <!--                        <el-input v-model="query.accountCode" class="input-width" placeholder="帐套名称"></el-input>-->
+          <!--                    </el-form-item>-->
+
+          <el-form-item label="帐套名称：">
+            <el-select v-model="query.accountCode" placeholder="全部" clearable class="input-width">
+              <el-option
+                      v-for="item in accountData"
+                      :key="item.id"
+                      :label="item.accountName"
+                      :value="item.accountCode">
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="创建时间：" >
+            <el-date-picker
+                    style="float: right;z-index: 1"
+                    size="small"
+                    v-model="queryDate"
+                    type="daterange"
+                    align="right"
+                    unlink-panels
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    @change="handleDateChange"
+                    :picker-options="pickerOptions">
+            </el-date-picker>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-card>
     <div class="total-layout">
       <el-row :gutter="20">
         <el-col :span="8">
@@ -33,19 +85,7 @@
       <el-row>
         <el-col>
           <div style="padding: 10px;border-left:1px solid #DCDFE6">
-            <el-date-picker
-                    style="float: left;z-index: 1"
-                    size="small"
-                    v-model="queryDate"
-                    type="daterange"
-                    align="right"
-                    unlink-panels
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    @change="handleDateChange"
-                    :picker-options="pickerOptions">
-            </el-date-picker>
+
             <div>
               <ve-line
                       height="700px"
@@ -68,7 +108,7 @@
   import img_home_today_amount from '@/assets/img/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
   import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/home';
-
+  import {listAccountData } from '@/api/index';
  const defaultListQuery ={
     accountCode: null,
     endTime:'',
@@ -102,7 +142,7 @@
 
         homeReportData: Object.assign({}, homeReportData),
         query: Object.assign({},defaultListQuery),
-
+        accountData:[],
         pickerOptions: {
           shortcuts: [{
             text: '最近一周',
@@ -149,8 +189,23 @@
       this.initOrderCountDate();
       this.getHomeReportData();
       this.getData();
+      this.getAccountData();
     },
     methods:{
+      // 获取帐套列表
+      getAccountData() {
+        listAccountData().then(res=>{
+          this.accountData = res.data
+        })
+      },
+      // 触发搜索按钮
+      handleSearch() {
+        this.$set(this.query, 'page', 1);
+        this.getData();
+      },
+      handleResetSearch() {
+        this.query = Object.assign({}, defaultListQuery);
+      },
       handleDateChange(){
         this.getData();
       },
