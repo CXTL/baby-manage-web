@@ -107,7 +107,7 @@
   import img_home_order from '@/assets/img/home_order.png';
   import img_home_today_amount from '@/assets/img/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
-  import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/home';
+  import { fetchHomeReportData, fetchHomeChartReportData} from '@/api/report/home';
   import {listAccountData } from '@/api/index';
  const defaultListQuery ={
     accountCode: null,

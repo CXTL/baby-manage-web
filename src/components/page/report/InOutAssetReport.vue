@@ -48,7 +48,7 @@
               header-cell-class-name="table-header"
       >
 
-        <el-table-column prop="startTime" label="收支日期" align="center"></el-table-column>
+        <el-table-column prop="assetDate" label="收支日期" align="center"></el-table-column>
         <el-table-column prop="totalIncome" label="总收入"  align="center"></el-table-column>
         <el-table-column prop="totalExpenditure"  label="总支出" align="center"></el-table-column>
 
@@ -73,12 +73,9 @@
 
 <script>
   import {getFirstTimestamp, getLastTimestamp} from '@/utils/date';
-  import img_home_order from '@/assets/img/home_order.png';
-  import img_home_today_amount from '@/assets/img/home_today_amount.png';
-  import img_home_yesterday_amount from '@/assets/img/home_yesterday_amount.png';
-  import {  fetchHomeChartReportData} from '@/api/home';
-  import { fetchAssetReportData } from '@/api/index';
-  import { exportAsset} from '@/api/assetReport';
+
+  import {  fetchInOutChartReportData, fetchInOutAssetData} from '@/api/report/inOutAsset.js';
+  import { exportAsset} from '@/api/report/assetReport';
 
   const defaultListQuery ={
     accountCode: null,
@@ -155,10 +152,7 @@
         tableData:[],
         dataEmpty: false,
         idx: -1,
-        id: -1,
-        img_home_order,
-        img_home_today_amount,
-        img_home_yesterday_amount
+        id: -1
       }
     },
 
@@ -179,7 +173,7 @@
         this.listLoading=true;
         this.query.startTime = getFirstTimestamp(this.queryDate[0]);
         this.query.endTime = getLastTimestamp(this.queryDate[1]);
-        fetchAssetReportData(this.query).then(res => {
+        fetchInOutAssetData(this.query).then(res => {
           this.listLoading=false;
           this.tableData = res.data.list;
           this.total = res.data.total || 50;
@@ -201,7 +195,7 @@
         setTimeout(() => {
           this.query.startTime = getFirstTimestamp(this.queryDate[0]);
           this.query.endTime = getLastTimestamp(this.queryDate[1]);
-          fetchHomeChartReportData(this.query).then(res => {
+          fetchInOutChartReportData(this.query).then(res => {
             this.chartData = {
               columns: ['date', 'totalIncome','totalExpenditure'],
               rows: []

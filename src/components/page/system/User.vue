@@ -237,8 +237,8 @@
     import { fetchUserData ,listAccountData} from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
     import {isvalidPass,isvalidPhone,isvalidEmail} from '@/utils/validate';
-    import { fetchAllRoleList } from '@/api/role';
-    import { createUser, deleteUser, listRoleByUserId, updateUser ,allocRole ,allocAccount,listAccountByUserId} from '@/api/user';
+    import { fetchAllRoleList } from '@/api/system/role';
+    import { createUser, deleteUser, listRoleByUserId, updateUser ,allocRole ,allocAccount,listAccountByUserId} from '@/api/system/user';
 
     const defaultListQuery = {
     username: null,

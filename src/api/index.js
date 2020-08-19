@@ -38,7 +38,7 @@ export const fetchAccountData = query => {
 };
 
 
-//帐套列表
+//科目列表
 export const fetchSubjectData = query => {
     return request({
         url: '/finance/subject/listByPage',

@@ -164,7 +164,7 @@
 <script>
 import { fetchRoleData } from '@/api/index';
 import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
-import {createRole,updateRole,deleteRole} from '@/api/role';
+import {createRole,updateRole,deleteRole} from '@/api/system/role';
 
 const defaultListQuery = {
     name: null,

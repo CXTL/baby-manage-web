@@ -186,7 +186,7 @@
 <script>
     import { fetchMenuData } from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
-    import {createMenu,updateMenu,deleteMenu} from '@/api/menu';
+    import {createMenu,updateMenu,deleteMenu} from '@/api/system/menu';
     import {isvalidNumber} from '@/utils/validate';
 
 const defaultListQuery = {

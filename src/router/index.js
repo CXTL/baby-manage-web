@@ -94,7 +94,7 @@ export default new Router({
                 },
                 {
                     path: '/assetReport',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/report/AssetReport'),
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/report/InOutAssetReport'),
                     meta: { title: '收支报表' }
                 },
                 {

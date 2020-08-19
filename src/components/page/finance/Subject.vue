@@ -195,7 +195,7 @@
 <script>
     import { fetchSubjectData } from '@/api/index';
     import { formatDate } from '@/utils/date';
-    import { createSubject, deleteSubject,  updateSubject,fetchTreeList} from '@/api/subject';
+    import { createSubject, deleteSubject,  updateSubject,fetchTreeList} from '@/api/finance/subject';
 
     const defaultListQuery = {
     subjectCode: null,

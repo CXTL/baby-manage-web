@@ -231,8 +231,8 @@
 <script>
     import { fetchInvestData,listAccountData } from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
-    import { createInvest, deleteInvest,  updateInvest} from '@/api/invest';
-    import { fetchTreeList} from '@/api/subject';
+    import { createInvest, deleteInvest,  updateInvest} from '@/api/finance/invest';
+    import { fetchTreeList} from '@/api/finance/subject';
     import {isvalidBigDecimal} from '@/utils/validate';
 
     const defaultListQuery = {

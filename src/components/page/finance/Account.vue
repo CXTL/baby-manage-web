@@ -181,7 +181,7 @@
 <script>
     import { fetchAccountData,listAccountData } from '@/api/index';
     import { formatDate ,getFirstTimestamp, getLastTimestamp} from '@/utils/date';
-    import { createAccount, deleteAccount,  updateAccount} from '@/api/account';
+    import { createAccount, deleteAccount,  updateAccount} from '@/api/finance/account';
     import {isvalidNumber} from '@/utils/validate';
 
     const defaultListQuery = {

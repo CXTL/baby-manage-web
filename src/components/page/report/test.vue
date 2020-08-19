@@ -230,8 +230,8 @@
 <script>
   import { fetchAssetData ,listAccountData} from '@/api/index';
   import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
-  import { createAsset, deleteAsset,  updateAsset} from '@/api/asset';
-  import { fetchTreeList} from '@/api/subject';
+  import { createAsset, deleteAsset,  updateAsset} from '@/api/finance/asset';
+  import { fetchTreeList} from '@/api/finance/subject';
 
 
   const defaultListQuery = {
