@@ -84,3 +84,12 @@ export const listAccountData = () => {
     });
 };
 
+
+//投资人列表
+export const fetchInvestorData = query => {
+    return request({
+        url: '/finance/investor/listByPage',
+        method: 'post',
+        data: query
+    });
+};

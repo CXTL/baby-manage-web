@@ -83,7 +83,19 @@ export default {
                     subs: [
                         {
                             index: 'invest',
-                            title: '投资管理'
+                            title: '投资管理',
+                            subs: [
+                                {
+                                    index: 'investor',
+                                    title: '投资人管理',
+
+                                },
+                                {
+                                    index: 'investFlow',
+                                    title: '投资流水管理'
+                                }
+                            ]
+
                         },
                         {
                             index: 'account',

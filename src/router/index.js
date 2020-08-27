@@ -73,9 +73,14 @@ export default new Router({
 
                 ,
                 {
-                    path: '/invest',
-                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/finance/Invest'),
-                    meta: { title: '投资管理' }
+                    path: '/investor',
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/finance/Investor'),
+                    meta: { title: '投资人管理' }
+                },
+                {
+                    path: '/investFlow',
+                    component: () => import(/* webpackChunkName: "403" */ '@/components/page/finance/InvestFlow'),
+                    meta: { title: '投资流水管理' }
                 },
                 {
                     path: '/account',

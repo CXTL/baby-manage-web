@@ -9,7 +9,7 @@ const service = axios.create({
     // baseURL: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
     baseURL: " http://10.0.105.50", // api的base_url
     // baseURL: " http://192.168.0.101", // api的base_url
-    // baseURL: "http://www.dupake.cn", // api的base_url
+    // baseURL: "http://dupake.cn", // api的base_url
     timeout: 5000 // 请求超时时间
 });
 

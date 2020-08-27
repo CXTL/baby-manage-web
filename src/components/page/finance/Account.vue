@@ -306,7 +306,7 @@ export default {
             fetchAccountData(this.query).then(res => {
                 this.listLoading=false;
                 this.tableData = res.data.list;
-                this.total = res.data.total || 50;
+                this.total = res.data.total;
             });
         },
 

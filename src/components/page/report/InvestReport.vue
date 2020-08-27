@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="statistics-layout">
-      <div class="layout-title">资产统计</div>
+      <div class="layout-title">投资统计</div>
       <el-row>
         <el-col>
           <div style="padding: 10px;border-left:1px solid #DCDFE6">
@@ -18,23 +18,20 @@
                     @change="handleDateChange"
                     :picker-options="pickerOptions">
             </el-date-picker>
-            <div>
-              <ve-line
-                      :data="chartData"
-                      :legend-visible="false"
-                      :loading="loading"
-                      :data-empty="dataEmpty"
-                      :settings="chartSettings"></ve-line>
-            </div>
           </div>
         </el-col>
+        <el-col>
+          <template>
+            <ve-pie :data="chartData" :settings="chartSettings" ></ve-pie>
+          </template>
+        </el-col>
+
+
       </el-row>
     </div>
 
-
-
     <div class="statistics-layout">
-      <div class="layout-title">资产详情 <el-button
+      <div class="layout-title">投资详情 <el-button
               type="primary"
               icon="el-icon-download"
               class="handle-del mr10"
@@ -48,12 +45,11 @@
               header-cell-class-name="table-header"
       >
 
-        <el-table-column prop="startTime" label="开始时间" align="center"></el-table-column>
-        <el-table-column prop="endTime" label="结束时间" align="center"></el-table-column>
-        <el-table-column prop="totalIncome" label="总收入"  align="center"></el-table-column>
-        <el-table-column prop="totalExpenditure"  label="总支出" align="center"></el-table-column>
-        <el-table-column prop="totalProfit" label="总利润" align="center"></el-table-column>
-        <el-table-column prop="totalAsset"  label="总资产" align="center"></el-table-column>
+        <el-table-column prop="assetDate" label="投资日期" align="center"></el-table-column>
+        <el-table-column prop="totalIncome" label="投资人"  align="center"></el-table-column>
+        <el-table-column prop="totalExpenditure"  label="实际投资金额" align="center"></el-table-column>
+        <el-table-column prop="totalExpenditure"  label="应投资金额" align="center"></el-table-column>
+
       </el-table>
 
 
@@ -145,13 +141,21 @@
         total: 0,
         queryDate: '',
         chartSettings: {
-          xAxisType: 'time',
-          area:false,
-          axisSite: { right: ['totalAsset']},
-          labelMap: {'totalIncome': '总收入', 'totalExpenditure': '总支出', 'totalAsset': '总资产' ,'totalProfit': '总利润'}},
+          dimension: '投资名称',
+          metrics: '投资金额'
+        },
         chartData: {
-          columns: [],
-          rows: []
+          // columns: [],
+          // rows: []
+          columns: ['投资名称', '投资金额'],
+          rows: [
+            { '投资名称': '张三', '投资金额': 1393 },
+            { '投资名称': 'test', '投资金额': 3530 },
+            { '投资名称': '1/3', '投资金额': 2923 },
+            { '投资名称': '1/4', '投资金额': 1723 },
+            { '投资名称': '1/5', '投资金额': 3792 },
+            { '投资名称': '1/6', '投资金额': 4593 }
+          ]
         },
         loading: false,
         tableData:[],
@@ -184,7 +188,7 @@
         fetchAssetReportData(this.query).then(res => {
           this.listLoading=false;
           this.tableData = res.data.list;
-          this.total = res.data.total || 50;
+          this.total = res.data.total;
         });
       },
       // 分页导航
@@ -238,9 +242,9 @@
       },
     },
     created(){
-      this.initOrderCountDate();
-      this.getHomeReportData();
-      this.getAssetChartData();
+      // this.initOrderCountDate();
+      // this.getHomeReportData();
+      // this.getAssetChartData();
     },
   }
 </script>
