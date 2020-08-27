@@ -26,3 +26,12 @@ export function deleteInvestor(params) {
     params: params
   })
 }
+
+
+export function listInvestor(params) {
+  return request({
+    url: '/finance/investor/listInvestor',
+    method: 'post',
+    params: params
+  })
+}

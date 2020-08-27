@@ -82,9 +82,9 @@
                 <el-table-column  label="ID" prop="id" width="55" align="center"></el-table-column>
                 <el-table-column  label="帐套名称"  prop="accountName" align="center"></el-table-column>
                 <el-table-column  label="科目名称"  prop="subjectName" align="center"></el-table-column>
-                <el-table-column  label="投资人名称" prop="investName"  align="center"></el-table-column>
-                <el-table-column label="实际投资金额" prop="investFund" align="center"></el-table-column>
-                <el-table-column label="投资总额" prop="investAmount" align="center"></el-table-column>
+                <el-table-column  label="投资人" prop="investorName"  align="center"></el-table-column>
+                <el-table-column label="实际投资金额" prop="actualInvestAmount" align="center"></el-table-column>
+                <el-table-column label="投资总额" prop="totalInvestAmount" align="center"></el-table-column>
                 <el-table-column label="应投资总额" prop="shouldInvestAmount" align="center"></el-table-column>
                 <el-table-column label="投资比例" prop="investRatio" align="center"></el-table-column>
                 <el-table-column label="投资日期" align="center">
@@ -135,7 +135,7 @@
         </div>
 
         <el-dialog
-                :title="isEdit?'编辑投资人信息':'添加投资人信息'"
+                :title="isEdit?'编辑投资流水':'添加投资流水'"
                 :visible.sync="dialogVisible"
                 width="40%">
             <el-form :model="invest"
@@ -160,11 +160,20 @@
                             <el-button slot="append" icon="el-icon-search" @click="handleClickSubject()"></el-button>
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="投资人名称："  prop="investName">
-                        <el-input v-model="invest.investName" style="width: 250px"></el-input>
+                    <el-form-item label="投资人："  prop="investorId">
+
+                        <el-select v-model="invest.investorId" placeholder="请选择" style="width: 250px">
+                            <el-option
+                                    v-for="item in investorData"
+                                    :key="item.id"
+                                    :label="item.investorName"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+
                     </el-form-item>
-                    <el-form-item label="实际投资金额："  prop="investFund">
-                        <el-input v-model="invest.investFund" style="width: 250px"></el-input>
+                    <el-form-item label="实际投资金额："  prop="actualInvestAmount">
+                        <el-input v-model="invest.actualInvestAmount" style="width: 250px"></el-input>
                     </el-form-item>
 
                 <el-form-item label="应投资总额："  prop="shouldInvestAmount">
@@ -231,7 +240,8 @@
 <script>
     import { fetchInvestData,listAccountData } from '@/api/index';
     import { formatDate,getFirstTimestamp, getLastTimestamp } from '@/utils/date';
-    import { createInvest, deleteInvest,  updateInvest} from '@/api/finance/invest';
+    import { createInvest, deleteInvest,  updateInvest} from '@/api/finance/investFlow';
+    import { listInvestor} from '@/api/finance/investor';
     import { fetchTreeList} from '@/api/finance/subject';
     import {isvalidBigDecimal} from '@/utils/validate';
 
@@ -248,10 +258,10 @@ const defaultInvest = {
     accountCode: null,
     subjectCode: null,
     subjectName: null,
-    investName: null,
+    investorId: null,
     investDate: '',
-    investFund: 0,
-    investAmount: 0,
+    actualInvestAmount: 0,
+    totalInvestAmount: 0,
     shouldInvestAmount: 0,
     investRatio: 0,
     remark: null
@@ -275,6 +285,7 @@ export default {
             },
             dialogSubjectVisible: false,
             accountData:[],
+            investorData:[],
             pickerOptions: {
                 shortcuts: [{
                     text: '最近一周',
@@ -320,16 +331,16 @@ export default {
                 subjectName: [
                     { required: true, message: '请选择科目', trigger: 'blur' }
                 ],
-                investName: [
-                    { required: true, message: '请输入投资人名称', trigger: 'blur' }
+                investorId: [
+                    { required: true, message: '请选择投资人', trigger: 'blur' }
                 ],
                 investDate: [
                     { required: true, message: '请选择投资日期', trigger: 'blur' }
                 ],
-                investFund: [
+                actualInvestAmount: [
                     { required: true,trigger: 'blur' , validator: validateBigDecimal}
                 ],
-                investAmount: [
+                totalInvestAmount: [
                     { required: true, trigger: 'blur' , validator: validateBigDecimal}
                 ],
                 shouldInvestAmount: [
@@ -581,12 +592,20 @@ export default {
             })
         },
 
+        // 获取帐套列表
+        listInvestor() {
+            listInvestor().then(res=>{
+                this.investorData = res.data
+            })
+        },
+
 
 
     },
     created() {
         this.initOrderCountDate();
         this.getAccountData();
+        this.listInvestor();
         this.getData();
         this.treeList();
     }
